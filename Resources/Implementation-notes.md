@@ -9,15 +9,12 @@
 **Decision:** This is intentional for a droplet-style utility app.
 
 **Rationale:**
+
 - Droplet applications (utilities that accept files via drag-and-drop) traditionally auto-quit after showing feedback
 - The 3-second timer runs independently of user interaction with the alert
 - This provides a consistent, predictable behavior: drop files → see result → app quits
 - Users of droplet apps expect this behavior and don't need to manually dismiss alerts or quit the app
 - If a user dismisses the alert early, the app will still quit after 3 seconds total, which is acceptable UX for this app category
-
-**Alternative Considered:** 
-
-We could implement a DispatchWorkItem that gets canceled when the alert is dismissed, but this adds complexity and changes the expected behavior pattern for droplet apps. The current implementation is simpler and matches user expectations.
 
 ### 2. Thread Safety of Counter Variables
 
@@ -36,7 +33,7 @@ We could implement a DispatchWorkItem that gets canceled when the alert is dismi
 
 **Code Flow:**
 
-```swift
+```bash
 1. Create serial queue
 2. For each file:
    - Process on background thread

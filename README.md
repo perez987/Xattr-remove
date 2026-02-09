@@ -1,4 +1,4 @@
-# Xattr-rm
+# Xattr-remove
 
 ![title](Resources/Images/AppIcon-96.png)
 
@@ -21,7 +21,7 @@ This app is a simpler and lighter version of [Xattr Editor](https://github.com/p
 
 ## Building
 
-Open `Xattr-rm.xcodeproj` in Xcode and build the project. The app requires macOS 13.0 or later.
+Open `Xattr-remove.xcodeproj` in Xcode and build the project. The app requires macOS 13.0 or later.
 
 ## Usage
 
