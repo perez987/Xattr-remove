@@ -2,7 +2,7 @@
 
 ![title](Resources/Images/AppIcon-96.png)
 
-macOS app developed with SwiftUI that removes `com.apple.quarantine` extended attribute from files downloaded from the Internet. Works as a droplet, accepting files via drag and drop or through the Finder icon.
+macOS app developed with SwiftUI that removes `com.apple.quarantine` extended attribute from files downloaded from the Internet. Works by accepting files via drag and drop onto the app window.
 
 This app is a simpler and lighter version of [Xattr Editor](https://github.com/perez987/Xattr-Editor). Instead of displaying and editing (removing, modifying, adding) extended attributes, it performs a single task: removing `com.apple.quarantine` in a quick way from files downloaded from the Internet so that they can be opened in macOS Tahoe (earlier macOS versions have a more relaxed warning system and can be opened more easily).
 
@@ -17,7 +17,7 @@ This app is a simpler and lighter version of [Xattr Editor](https://github.com/p
 - Drop files onto the app window to remove the quarantine attribute
 - Built with Swift and SwiftUI
 - Handles errors (whether the attribute exists or not)
-- Works as a droplet - files can be dropped directly on the app icon in Finder or Dock
+- Supports all file types including apps and executables
 
 ## Building
 
@@ -25,10 +25,13 @@ Open `Xattr-remove.xcodeproj` in Xcode and build the project. The app requires m
 
 ## Usage
 
-1. Drag and drop files that have the quarantine attribute onto the app window or app icon in Finder/Dock
-2. The quarantine attribute (if exists) will be automatically removed
-3. The user gets an alert as feedback
-4. The app automatically quits 3 seconds after displaying a success alert
+1. Launch the app to open the main window
+2. Drag and drop files that have the quarantine attribute onto the app window
+3. The quarantine attribute (if it exists) will be automatically removed
+4. The user gets an alert as feedback
+5. The app automatically quits 3 seconds after displaying a success alert
+
+**Note:** Files must be dropped onto the app window. Dropping files onto the app icon in Finder or Dock is not supported due to macOS Gatekeeper restrictions with quarantined executables.
 
 ## Requirements
 

@@ -15,10 +15,6 @@ struct Xattr_rmApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(fileProcessor)
-                .onOpenURL { url in
-                    // Handle files dropped on the app icon
-                    fileProcessor.processFiles([url])
-                }
         }
         .windowResizability(.contentSize)
         .commands {
