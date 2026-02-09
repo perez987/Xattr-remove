@@ -36,7 +36,7 @@ Open `Xattr-rm.xcodeproj` in Xcode and build the project. The app requires macOS
 
 ## First run
 
-The drawback of Xattr-remove is that, as an application downloaded from the internet, it also displays the Gatekeeper warning on the first run. This is unavoidable since the app is only ad-hoc signed and not notarized. This doesn't happen if you download the source code, compile the app using Xcode, and save the product for regular use.
+The drawback of Xattr-remove is that, since it's also an app downloaded from the internet, it also displays the Gatekeeper warning on the first run. This is unavoidable since the app is only ad-hoc signed and not notarized. This doesn't happen if you download the source code, compile the app using Xcode, and save the product for regular use.
 
 ## Credits
 
