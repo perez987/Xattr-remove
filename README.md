@@ -2,7 +2,7 @@
 
 ![title](Resources/Images/AppIcon-96.png)
 
-macOS app developed with SwiftUI that removes `com.apple.quarantine` extended attribute from files downloaded from the Internet. Works as a droplet, accepting files via drag and drop or through the Finder icon..
+macOS app developed with SwiftUI that removes `com.apple.quarantine` extended attribute from files downloaded from the Internet. Works as a droplet, accepting files via drag and drop or through the Finder icon.
 
 This app is a simpler and lighter version of [Xattr Editor](https://github.com/perez987/Xattr-Editor). Instead of displaying and editing (removing, modifying, adding) extended attributes, it performs a single task: removing `com.apple.quarantine` in a quick way from files downloaded from the Internet so that they can be opened in macOS Tahoe (earlier macOS versions have a more relaxed warning system and can be opened more easily).
 
