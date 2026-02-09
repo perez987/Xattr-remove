@@ -1,4 +1,4 @@
-# Xattr-rm
+# Xattr-remove
 
 ## Key Features
 
@@ -28,7 +28,7 @@
 
 ## Building and Running
 
-1. Open `Xattr-rm.xcodeproj` in Xcode
+1. Open `Xattr-remove.xcodeproj` in Xcode
 2. Build (⌘B) and Run (⌘R)
 3. Drop files onto the app window or app icon
 

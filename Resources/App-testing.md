@@ -1,10 +1,10 @@
-# Testing Guide for Xattr-remove-2
+# Testing Guide for Xattr-remove
 
-This guide provides comprehensive testing scenarios to validate the changes made to the application.
+This guide provides comprehensive testing scenarios to validate the application.
 
 ## Changes Implemented
 
-1. **Differentiated Alert Messages**: The app now shows different messages based on:
+1. **Differentiated Alert Messages**: The app  shows different messages based on:
 
 2. 
    - Files where quarantine attribute was removed
@@ -19,10 +19,7 @@ This guide provides comprehensive testing scenarios to validate the changes made
 
 ### Scenario 1: Single File with Quarantine Attribute
 
-**Setup:**
-
-1. Download a file from the internet to ensure it has the quarantine attribute
-2. Build and run the app in Xcode
+Download a file from the internet to ensure it has the quarantine attribute
 
 **Test Case: Drop on App Window, Finder icon or Dock icon**
 
@@ -33,10 +30,7 @@ This guide provides comprehensive testing scenarios to validate the changes made
 
 ### Scenario 2: Multiple Files with Quarantine Attribute
 
-**Setup:**
-
-1. Download multiple files from the internet
-2. Build and run the app in Xcode
+Download multiple files from the internet
 
 **Test:**
 
@@ -47,10 +41,7 @@ This guide provides comprehensive testing scenarios to validate the changes made
 
 ### Scenario 3: Single File without Quarantine Attribute
 
-**Setup:**
-
-1. Create a new file locally (e.g., `touch test.txt`)
-2. Build and run the app in Xcode
+Create a new file locally (e.g., `touch test.txt`)
 
 **Test:**
 
@@ -61,10 +52,7 @@ This guide provides comprehensive testing scenarios to validate the changes made
 
 ### Scenario 4: Multiple Files without Quarantine Attribute
 
-**Setup:**
-
-1. Create multiple files locally (e.g., `touch test1.txt test2.txt test3.txt`)
-2. Build and run the app in Xcode
+Create multiple files locally (e.g., `touch test1.txt test2.txt test3.txt`)
 
 **Test:**
 
@@ -75,12 +63,9 @@ This guide provides comprehensive testing scenarios to validate the changes made
 
 ### Scenario 5: Mixed Files (Some with, Some without Quarantine Attribute)
 
-**Setup:**
-
-1. Prepare:
-   - 2-3 files downloaded from the internet (with quarantine attribute)
-   - 2-3 files created locally (without quarantine attribute)
-2. Build and run the app in Xcode
+Prepare:
+   - files downloaded from the internet (with quarantine attribute)
+   - files created locally (without quarantine attribute)
 
 **Test:**
 
@@ -93,8 +78,6 @@ This guide provides comprehensive testing scenarios to validate the changes made
    - Alert disappears and app quits after 3 seconds
 
 ### Scenario 6: Error Handling (Protected File)
-
-**Setup:**
 
 1. Try to drop a file from a system-protected location (if possible)
 2. Or test with a file in a location without write permissions
@@ -110,9 +93,7 @@ This guide provides comprehensive testing scenarios to validate the changes made
 
 ### Scenario 7: Multiple Files with Errors
 
-**Setup:**
-
-1. Prepare a mix of:
+Prepare a mix of:
    - Normal files (that should process successfully)
    - Protected files (that should fail)
 
