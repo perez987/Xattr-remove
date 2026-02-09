@@ -25,9 +25,10 @@ Open `Xattr-remove.xcodeproj` in Xcode and build the project. The app requires m
 
 ## Usage
 
-1. Build and run the app from Xcode
-2. Drag and drop files that have the quarantine attribute onto the app window or app icon in Finder/Dock
-3. The quarantine attribute (if exists) will be automatically removed
+1. Drag and drop files that have the quarantine attribute onto the app window or app icon in Finder/Dock
+2. The quarantine attribute (if exists) will be automatically removed
+3. The user gets an alert as feedback
+4. The app automatically quits 3 seconds after displaying a success alert
 
 ## Requirements
 
