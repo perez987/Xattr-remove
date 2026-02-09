@@ -1,0 +1,47 @@
+# Xattr-rm
+
+![title](Resources/Images/AppIcon-96.png)
+
+macOS app developed with SwiftUI that removes `com.apple.quarantine` extended attribute from files downloaded from the Internet. Works as a droplet, accepting files via drag and drop or through the Finder icon..
+
+This app is a simpler and lighter version of [Xattr Editor](https://github.com/perez987/Xattr-Editor). Instead of displaying and editing (removing, modifying, adding) extended attributes, it performs a single task: removing `com.apple.quarantine` in a quick way from files downloaded from the Internet so that they can be opened in macOS Tahoe (earlier macOS versions have a more relaxed warning system and can be opened more easily).
+
+| Screenshots |
+|:----|
+| ![title](Resources/Images/Window1.png) |
+| ![title](Resources/Images/Window2.png) |
+| ![title](Resources/Images/Window3.png) | 
+
+## Features
+
+- Drop files onto the app window to remove the quarantine attribute
+- Built with Swift and SwiftUI
+- Handles errors (whether the attribute exists or not)
+- Works as a droplet - files can be dropped directly on the app icon in Finder or Dock
+
+## Building
+
+Open `Xattr-rm.xcodeproj` in Xcode and build the project. The app requires macOS 13.0 or later.
+
+## Usage
+
+1. Build and run the app from Xcode
+2. Drag and drop files that have the quarantine attribute onto the app window or app icon in Finder/Dock
+3. The quarantine attribute (if exists) will be automatically removed
+
+## Requirements
+
+- macOS 13.0 or later
+- Xcode 14.0 or later (for building)
+
+## First run
+
+The drawback of Xattr-remove is that, as an application downloaded from the internet, it also displays the Gatekeeper warning on the first run. This is unavoidable since the app is only ad-hoc signed and not notarized. This doesn't happen if you download the source code, compile the app using Xcode, and save the product for regular use.
+
+## Credits
+
+Based on:
+
+- https://github.com/rcsiko/xattr-editor
+- https://github.com/perez987/Xattr-Editor
+- https://github.com/abra-code/XattrApp
