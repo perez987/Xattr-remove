@@ -14,15 +14,15 @@
 "success_title" = "Erfolg";
 
 /* Error Messages */
-"error_single_file" = "Das Quarantäne-Attribut konnte nicht entfernt werden. Die Datei befindet sich möglicherweise an einem geschützten Ort oder erfordert Administratorrechte.";
-"error_multiple_files" = "Das Quarantäne-Attribut konnte nicht von %d Datei(en) entfernt werden. Einige Dateien befinden sich möglicherweise an geschützten Orten oder erfordern Administratorrechte.";
+"error_single_file" = "Das Quarantäne-Attribut konnte nicht entfernt werden. Die Datei befindet sich möglicherweise an einem geschützten Ort oder erfordert Administratorrechte";
+"error_multiple_files" = "Das Quarantäne-Attribut konnte nicht von %d Datei(en) entfernt werden. Einige Dateien befinden sich möglicherweise an geschützten Orten oder erfordern Administratorrechte";
 
 /* Success Messages */
-"success_removed_single" = "Quarantäne-Attribut erfolgreich von der Datei entfernt.";
+"success_removed_single" = "Quarantäne-Attribut erfolgreich von der Datei entfernt";
 "success_removed_multiple" = "Quarantäne-Attribut erfolgreich von %d Dateien entfernt.";
-"success_not_present_single" = "1 Datei erfolgreich verarbeitet (Quarantäne-Attribut war nicht vorhanden).";
-"success_not_present_multiple" = "%d Dateien erfolgreich verarbeitet (Quarantäne-Attribut war nicht vorhanden).";
-"success_mixed" = "%d Dateien erfolgreich verarbeitet (%d entfernt, %d bereits bereinigt).";
+"success_not_present_single" = "1 Datei erfolgreich verarbeitet (Quarantäne-Attribut war nicht vorhanden)";
+"success_not_present_multiple" = "%d Dateien erfolgreich verarbeitet (Quarantäne-Attribut war nicht vorhanden)";
+"success_mixed" = "%d Dateien erfolgreich verarbeitet (%d entfernt, %d bereits bereinigt)";
 
 /* Language Menu */
 "menu_language" = "Sprache";

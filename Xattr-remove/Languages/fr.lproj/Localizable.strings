@@ -14,15 +14,15 @@
 "success_title" = "Succès";
 
 /* Error Messages */
-"error_single_file" = "Impossible de supprimer com.apple.quarantine. Un fichier peût se trouver dans un emplacement protégé ou nécessiter des privilèges d'administrateur.";
-"error_multiple_files" = "Impossible de supprimer com.apple.quarantine de %d fichier(s). Certains fichiers peuvent se trouver dans des emplacements protégés ou nécessiter des privilèges d'administrateur.";
+"error_single_file" = "Impossible de supprimer com.apple.quarantine. Un fichier peût se trouver dans un emplacement protégé ou nécessiter des privilèges d'administrateur";
+"error_multiple_files" = "Impossible de supprimer com.apple.quarantine de %d fichier(s). Certains fichiers peuvent se trouver dans des emplacements protégés ou nécessiter des privilèges d'administrateur";
 
 /* Success Messages */
-"success_removed_single" = "Supprimé avec succès l'attribut com.apple.quarantine du fichier.";
-"success_removed_multiple" = "Supprimé avec succès l'attribut com.apple.quarantine de %d fichiers.";
-"success_not_present_single" = "Traité avec succès 1 fichier (com.apple.quarantine n'était pas présent).";
-"success_not_present_multiple" = "Traités avec succès %d fichiers (com.apple.quarantine n'était pas présent).";
-"success_mixed" = "Traités avec succès %d fichiers (%d supprimé(s), %d déjà nettoyé(s)).";
+"success_removed_single" = "Supprimé avec succès l'attribut com.apple.quarantine du fichier";
+"success_removed_multiple" = "Supprimé avec succès l'attribut com.apple.quarantine de %d fichiers";
+"success_not_present_single" = "Traité avec succès 1 fichier (com.apple.quarantine n'était pas présent)";
+"success_not_present_multiple" = "Traités avec succès %d fichiers (com.apple.quarantine n'était pas présent)";
+"success_mixed" = "Traités avec succès %d fichiers (%d supprimé(s), %d déjà nettoyé(s))";
 
 /* Language Menu */
 "menu_language" = "Langue";

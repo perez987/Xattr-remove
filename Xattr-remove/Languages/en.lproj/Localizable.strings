@@ -14,15 +14,15 @@
 "success_title" = "Success";
 
 /* Error Messages */
-"error_single_file" = "Failed to remove quarantine attribute. The file may be in a protected location or require administrator privileges.";
-"error_multiple_files" = "Failed to remove quarantine attribute from %d file(s). Some files may be in protected locations or require administrator privileges.";
+"error_single_file" = "Failed to remove quarantine attribute. The file may be in a protected location or require administrator privileges";
+"error_multiple_files" = "Failed to remove quarantine attribute from %d file(s). Some files may be in protected locations or require administrator privileges";
 
 /* Success Messages */
-"success_removed_single" = "Successfully removed quarantine attribute from file.";
-"success_removed_multiple" = "Successfully removed quarantine attribute from %d files.";
-"success_not_present_single" = "Successfully processed 1 file (quarantine attribute was not present).";
-"success_not_present_multiple" = "Successfully processed %d files (quarantine attribute was not present).";
-"success_mixed" = "Successfully processed %d files (%d removed, %d already cleaned).";
+"success_removed_single" = "Successfully removed quarantine attribute from file";
+"success_removed_multiple" = "Successfully removed quarantine attribute from %d files";
+"success_not_present_single" = "Successfully processed 1 file (quarantine attribute was not present)";
+"success_not_present_multiple" = "Successfully processed %d files (quarantine attribute was not present)";
+"success_mixed" = "Successfully processed %d files (%d removed, %d already cleaned)";
 
 /* Language Menu */
 "menu_language" = "Language";
