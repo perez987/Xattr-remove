@@ -12,6 +12,7 @@ This app is a simpler and lighter version of [Xattr Editor](https://github.com/p
 | ![title](Resources/Images/Quarantine-files.png) |
 | ![title](Resources/Images/Unquarantine-files.png) |
 | ![title](Resources/Images/Mixed-files.png) |
+| ![title](Resources/Images/Languages.png) |
 
 ## Features
 
