@@ -19,6 +19,8 @@ This app is a simpler and lighter version of [Xattr Editor](https://github.com/p
 - Built with Swift and SwiftUI
 - Handles errors (whether the attribute exists or not)
 - Supports all file types including apps and executables
+- Localization system with language selector and 5 languages (German, English, French, Italian and Spanish)
+- Language selector: `Language` > `Select language` in menubar or `⌘ + L` keyboard shortcut 
 
 ## Building
 

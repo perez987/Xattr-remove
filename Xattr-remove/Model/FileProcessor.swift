@@ -54,35 +54,47 @@ class FileProcessor: ObservableObject {
             
             DispatchQueue.main.async {
                 if failedCount > 0 {
-                    self.alertTitle = "Error"
+                    self.alertTitle = NSLocalizedString("error_title", comment: "Error alert title")
                     if failedCount == 1 && removedCount == 0 && notFoundCount == 0 {
-                        self.alertMessage = "Failed to remove quarantine attribute. The file may be in a protected location or require administrator privileges."
+                        self.alertMessage = NSLocalizedString("error_single_file", comment: "Error message for single file")
                     } else {
-                        self.alertMessage = "Failed to remove quarantine attribute from \(failedCount) file(s). Some files may be in protected locations or require administrator privileges."
+                        self.alertMessage = String.localizedStringWithFormat(
+                            NSLocalizedString("error_multiple_files", comment: "Error message for multiple files"),
+                            failedCount
+                        )
                     }
                     self.showAlert = true
                 } else if removedCount > 0 || notFoundCount > 0 {
-                    self.alertTitle = "Success"
+                    self.alertTitle = NSLocalizedString("success_title", comment: "Success alert title")
                     
                     // Build appropriate message based on counts
                     if removedCount > 0 && notFoundCount == 0 {
                         // Only removed files
                         if removedCount == 1 {
-                            self.alertMessage = "Successfully removed quarantine attribute from file."
+                            self.alertMessage = NSLocalizedString("success_removed_single", comment: "Success message for single removed file")
                         } else {
-                            self.alertMessage = "Successfully removed quarantine attribute from \(removedCount) files."
+                            self.alertMessage = String.localizedStringWithFormat(
+                                NSLocalizedString("success_removed_multiple", comment: "Success message for multiple removed files"),
+                                removedCount
+                            )
                         }
                     } else if removedCount == 0 && notFoundCount > 0 {
                         // Only not found files
                         if notFoundCount == 1 {
-                            self.alertMessage = "Successfully processed 1 file (quarantine attribute was not present)."
+                            self.alertMessage = NSLocalizedString("success_not_present_single", comment: "Success message for single file without quarantine")
                         } else {
-                            self.alertMessage = "Successfully processed \(notFoundCount) files (quarantine attribute was not present)."
+                            self.alertMessage = String.localizedStringWithFormat(
+                                NSLocalizedString("success_not_present_multiple", comment: "Success message for multiple files without quarantine"),
+                                notFoundCount
+                            )
                         }
                     } else {
                         // Mixed results
                         let total = removedCount + notFoundCount
-                        self.alertMessage = "Successfully processed \(total) files (\(removedCount) removed, \(notFoundCount) already cleaned)."
+                        self.alertMessage = String.localizedStringWithFormat(
+                            NSLocalizedString("success_mixed", comment: "Success message for mixed results"),
+                            total, removedCount, notFoundCount
+                        )
                     }
                     
                     self.showAlert = true

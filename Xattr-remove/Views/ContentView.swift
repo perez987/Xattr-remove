@@ -22,21 +22,21 @@ struct ContentView: View {
                 .font(.system(size: 58))
                 .foregroundColor(isTargeted ? .blue : .gray)
             
-            Text("Drop file here")
+            Text(NSLocalizedString("drop_file_here", comment: "Main UI text"))
                 .font(.title2)
                 .foregroundColor(.secondary)
             
-            Text("to remove quarantine attribute")
+            Text(NSLocalizedString("remove_quarantine_subtitle", comment: "Subtitle text"))
                 .font(.body)
                 .foregroundColor(.secondary)
         }
         .frame(
-            minWidth: 282,
-            idealWidth: 282,
-            maxWidth: 282,
-            minHeight: 282,
-            idealHeight: 282,
-            maxHeight: 282
+            minWidth: 300,
+            idealWidth: 300,
+            maxWidth: 300,
+            minHeight: 300,
+            idealHeight: 300,
+            maxHeight: 300
         )
         .background(isTargeted ? Color.blue.opacity(0.1) : Color.clear)
         // Note: macOS may log reentrant drag IPC messages in Xcode console during drag operations.
@@ -46,7 +46,7 @@ struct ContentView: View {
             return true
         }
         .alert(fileProcessor.alertTitle, isPresented: $fileProcessor.showAlert) {
-            Button("OK", role: .cancel) { }
+            Button(NSLocalizedString("ok_button", comment: "OK button"), role: .cancel) { }
         } message: {
             Text(fileProcessor.alertMessage)
         }
