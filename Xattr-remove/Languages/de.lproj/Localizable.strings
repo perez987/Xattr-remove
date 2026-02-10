@@ -30,6 +30,6 @@
 "language_selector_title" = "Sprache auswählen";
 "accept" = "Akzeptieren";
 "cancel" = "Abbrechen";
-"ok" = "OK";
+"ok" = "Akzeptieren";
 "language_changed_title" = "Sprache geändert";
 "language_changed_message" = "Bitte starten Sie die Anwendung neu,\num die neue Sprache anzuwenden.";
