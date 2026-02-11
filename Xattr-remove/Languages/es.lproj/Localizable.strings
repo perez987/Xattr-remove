@@ -11,7 +11,7 @@
 
 /* Alert Titles */
 "error_title" = "Error";
-"success_title" = "Éxito";
+"success_title" = "Confirmación";
 
 /* Error Messages */
 "error_single_file" = "No se pudo eliminar com.apple.quarantine. El archivo puede estar en una ubicación protegida o requerir privilegios de administrador";

@@ -57,7 +57,7 @@
 			children = (
 				2D0000020000000000000004 /* Assets.xcassets */,
 				2D0000020000000000000006 /* Info.plist */,
-				D966FCF92F3BBC5600FFBEAF /* Languages */,
+				D92C9BBE2F3BBD9C0058697B /* Languages */,
 				D9A9C6D62F3957440033B910 /* Model */,
 				D9A9C6D72F3957490033B910 /* Views */,
 				2D0000020000000000000005 /* Xattr_remove.entitlements */,
@@ -74,7 +74,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		D966FCF92F3BBC5600FFBEAF /* Languages */ = {
+		D92C9BBE2F3BBD9C0058697B /* Languages */ = {
 			isa = PBXGroup;
 			children = (
 				D9F3328F2F3BBA51001CDDB0 /* LanguageSelectorView.swift */,

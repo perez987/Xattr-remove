@@ -13,27 +13,30 @@ class FileProcessor: ObservableObject {
     @Published var showAlert = false
     @Published var alertTitle = ""
     @Published var alertMessage = ""
-    
+
     private let logger = Logger(subsystem: "com.xattr-rm.app", category: "FileProcessor")
-    
-    /// Process a list of file URLs
+
+    // Delay after dismissing alert before terminating app (needed for macOS Sonoma compatibility)
+     private let alertDismissalDelay: TimeInterval = 0.1
+
+    // Process a list of file URLs
     func processFiles(_ urls: [URL]) {
         guard !urls.isEmpty else { return }
-        
+
         logger.info("Processing \(urls.count) file(s)")
-        
+
         let group = DispatchGroup()
         let queue = DispatchQueue(label: "com.xattr-rm.file-processing")
         var removedCount = 0
         var notFoundCount = 0
         var failedCount = 0
-        
+
         for url in urls {
             group.enter()
             // Process file on background thread to avoid blocking UI
             DispatchQueue.global(qos: .userInitiated).async {
                 let result = XattrManager.removeQuarantineAttribute(from: url)
-                
+
                 queue.async {
                     switch result {
                     case .success:
@@ -47,11 +50,11 @@ class FileProcessor: ObservableObject {
                 }
             }
         }
-        
+
         // Show result alert after all files are processed
         group.notify(queue: queue) {
             self.logger.info("Processing complete: \(removedCount) removed, \(notFoundCount) not found, \(failedCount) failed")
-            
+
             DispatchQueue.main.async {
                 if failedCount > 0 {
                     self.alertTitle = NSLocalizedString("error_title", comment: "Error alert title")
@@ -65,7 +68,7 @@ class FileProcessor: ObservableObject {
                     }
                     self.showAlert = true
                 } else if removedCount > 0 || notFoundCount > 0 {
-//                    self.alertTitle = NSLocalizedString("success_title", comment: "Success alert title")
+                    self.alertTitle = NSLocalizedString("success_title", comment: "Success alert title")
 
                     // Build appropriate message based on counts
                     if removedCount > 0 && notFoundCount == 0 {
@@ -96,15 +99,20 @@ class FileProcessor: ObservableObject {
                             total, removedCount, notFoundCount
                         )
                     }
-                    
+
                     self.showAlert = true
-                    
-                    // Schedule app quit after 3 seconds
+
+                    // Schedule alert dismissal and app quit after 3 seconds
                     DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-                        NSApplication.shared.terminate(nil)
+                        self.showAlert = false
+                         // Delay to ensure alert is dismissed before terminating
+                         DispatchQueue.main.asyncAfter(deadline: .now() + self.alertDismissalDelay) {
+                             NSApplication.shared.terminate(nil)
+                         }
                     }
                 }
             }
         }
     }
 }
+
