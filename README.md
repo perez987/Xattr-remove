@@ -1,7 +1,5 @@
 # Xattr-remove
 
-![title](Images/AppIcon-96.png)
-
 <a href="README-ES.md">
     <img src="https://img.shields.io/badge/Spanish-README-blue" alt=“Spanish README”>
 </a><br><br>
