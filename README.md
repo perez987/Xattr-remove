@@ -4,7 +4,7 @@
 
 <a href="README-ES.md">
     <img src="https://img.shields.io/badge/Spanish-README-blue" alt=“Spanish README”>
-</a><br>
+</a><br><br>
 
 macOS app developed with SwiftUI that removes `com.apple.quarantine` extended attribute from files downloaded from the Internet. Works by accepting files via drag and drop onto the app window.
 
