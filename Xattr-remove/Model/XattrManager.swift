@@ -8,7 +8,7 @@
 import Foundation
 import os.log
 
-/// Result of removing a quarantine attribute
+// Result of removing a quarantine attribute
 enum QuarantineRemovalResult {
     case success
     case notFound
@@ -17,18 +17,18 @@ enum QuarantineRemovalResult {
 }
 
 class XattrManager {
-    /// The quarantine attribute name
+    // The quarantine attribute name
     private static let quarantineAttribute = "com.apple.quarantine"
     
-    /// XATTR_NOFOLLOW flag - don't follow symbolic links
+   /// XATTR_NOFOLLOW flag - don't follow symbolic links
     private static let XATTR_NOFOLLOW: Int32 = 0x0001
     
-    /// Logger for xattr operations
+    // Logger for xattr operations
     private static let logger = Logger(subsystem: "com.xattr-rm.app", category: "XattrManager")
     
-    /// Removes the com.apple.quarantine extended attribute from a file
-    /// - Parameter url: The URL of the file to process
-    /// - Returns: The result of the removal operation
+    // Removes the com.apple.quarantine extended attribute from a file
+    // - Parameter url: The URL of the file to process
+    // - Returns: The result of the removal operation
     static func removeQuarantineAttribute(from url: URL) -> QuarantineRemovalResult {
         let path = url.path
         

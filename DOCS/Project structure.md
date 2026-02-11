@@ -21,7 +21,7 @@
 
 ### 3. Window-Only Operation
 
-- Simple SwiftUI App structure without AppDelegate or document handling
+- SwiftUI App structure with lightweight AppDelegate (via `NSApplicationDelegateAdaptor`) to disable window state restoration
 - Files must be dropped onto the app window (not Finder or Dock icons)
 - App automatically quits 3 seconds after successful processing
 

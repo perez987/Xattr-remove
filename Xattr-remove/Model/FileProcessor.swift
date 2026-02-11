@@ -9,15 +9,24 @@ import Foundation
 import SwiftUI
 import os.log
 
+// Groups all alert-related state into a single value so that
+// updating it triggers only one `objectWillChange` notification,
+// preventing "Publishing changes from within view updates" warnings.
+struct AlertState {
+    var isPresented = false
+    var title = ""
+    var message = ""
+}
+
 class FileProcessor: ObservableObject {
-    @Published var showAlert = false
-    @Published var alertTitle = ""
-    @Published var alertMessage = ""
+    @Published var alertState = AlertState()
 
     private let logger = Logger(subsystem: "com.xattr-rm.app", category: "FileProcessor")
 
+    // Delay for displaying success alert before auto-quit
+    private let alertDisplayDuration: TimeInterval = 3.0
     // Delay after dismissing alert before terminating app (needed for macOS Sonoma compatibility)
-     private let alertDismissalDelay: TimeInterval = 0.1
+    private let alertDismissalDelay: TimeInterval = 0.2
 
     // Process a list of file URLs
     func processFiles(_ urls: [URL]) {
@@ -55,60 +64,71 @@ class FileProcessor: ObservableObject {
         group.notify(queue: queue) {
             self.logger.info("Processing complete: \(removedCount) removed, \(notFoundCount) not found, \(failedCount) failed")
 
-            DispatchQueue.main.async {
-                if failedCount > 0 {
-                    self.alertTitle = NSLocalizedString("error_title", comment: "Error alert title")
-                    if failedCount == 1 && removedCount == 0 && notFoundCount == 0 {
-                        self.alertMessage = NSLocalizedString("error_single_file", comment: "Error message for single file")
+            // Capture the final counts before entering @MainActor context to avoid concurrency issues
+            let finalRemovedCount = removedCount
+            let finalNotFoundCount = notFoundCount
+            let finalFailedCount = failedCount
+
+            // Build alert state locally then assign once to trigger a single objectWillChange
+            DispatchQueue.main.asyncAfter(deadline: .now()) {
+                var newState = AlertState()
+
+                if finalFailedCount > 0 {
+                    newState.title = NSLocalizedString("error_title", comment: "Error alert title")
+                    if finalFailedCount == 1 && finalRemovedCount == 0 && finalNotFoundCount == 0 {
+                        newState.message = NSLocalizedString("error_single_file", comment: "Error message for single file")
                     } else {
-                        self.alertMessage = String.localizedStringWithFormat(
+                        newState.message = String.localizedStringWithFormat(
                             NSLocalizedString("error_multiple_files", comment: "Error message for multiple files"),
-                            failedCount
+                            finalFailedCount
                         )
                     }
-                    self.showAlert = true
-                } else if removedCount > 0 || notFoundCount > 0 {
-                    self.alertTitle = NSLocalizedString("success_title", comment: "Success alert title")
+                    newState.isPresented = true
+                    self.alertState = newState
+                } else if finalRemovedCount > 0 || finalNotFoundCount > 0 {
+                    newState.title = NSLocalizedString("success_title", comment: "Success alert title")
 
                     // Build appropriate message based on counts
-                    if removedCount > 0 && notFoundCount == 0 {
+                    if finalRemovedCount > 0 && finalNotFoundCount == 0 {
                         // Only removed files
-                        if removedCount == 1 {
-                            self.alertMessage = NSLocalizedString("success_removed_single", comment: "Success message for single removed file")
+                        if finalRemovedCount == 1 {
+                            newState.message = NSLocalizedString("success_removed_single", comment: "Success message for single removed file")
                         } else {
-                            self.alertMessage = String.localizedStringWithFormat(
+                            newState.message = String.localizedStringWithFormat(
                                 NSLocalizedString("success_removed_multiple", comment: "Success message for multiple removed files"),
-                                removedCount
+                                finalRemovedCount
                             )
                         }
-                    } else if removedCount == 0 && notFoundCount > 0 {
+                    } else if finalRemovedCount == 0 && finalNotFoundCount > 0 {
                         // Only not found files
-                        if notFoundCount == 1 {
-                            self.alertMessage = NSLocalizedString("success_not_present_single", comment: "Success message for single file without quarantine")
+                        if finalNotFoundCount == 1 {
+                            newState.message = NSLocalizedString("success_not_present_single", comment: "Success message for single file without quarantine")
                         } else {
-                            self.alertMessage = String.localizedStringWithFormat(
+                            newState.message = String.localizedStringWithFormat(
                                 NSLocalizedString("success_not_present_multiple", comment: "Success message for multiple files without quarantine"),
-                                notFoundCount
+                                finalNotFoundCount
                             )
                         }
                     } else {
                         // Mixed results
-                        let total = removedCount + notFoundCount
-                        self.alertMessage = String.localizedStringWithFormat(
+                        let total = finalRemovedCount + finalNotFoundCount
+                        newState.message = String.localizedStringWithFormat(
                             NSLocalizedString("success_mixed", comment: "Success message for mixed results"),
-                            total, removedCount, notFoundCount
+                            total, finalRemovedCount, finalNotFoundCount
                         )
                     }
 
-                    self.showAlert = true
+                    newState.isPresented = true
+                    self.alertState = newState
 
-                    // Schedule alert dismissal and app quit after 3 seconds
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-                        self.showAlert = false
-                         // Delay to ensure alert is dismissed before terminating
-                         DispatchQueue.main.asyncAfter(deadline: .now() + self.alertDismissalDelay) {
-                             NSApplication.shared.terminate(nil)
-                         }
+                    // Schedule app quit after display duration
+                    // Hide windows first via orderOut (avoids SwiftUI binding teardown warnings),
+                    // then exit cleanly without triggering SwiftUI view lifecycle
+                    DispatchQueue.main.asyncAfter(deadline: .now() + self.alertDisplayDuration) {
+                        NSApplication.shared.windows.forEach { $0.orderOut(nil) }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + self.alertDismissalDelay) {
+                            exit(0)
+                        }
                     }
                 }
             }
