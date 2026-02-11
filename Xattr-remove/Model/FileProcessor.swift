@@ -65,8 +65,8 @@ class FileProcessor: ObservableObject {
                     }
                     self.showAlert = true
                 } else if removedCount > 0 || notFoundCount > 0 {
-                    self.alertTitle = NSLocalizedString("success_title", comment: "Success alert title")
-                    
+//                    self.alertTitle = NSLocalizedString("success_title", comment: "Success alert title")
+
                     // Build appropriate message based on counts
                     if removedCount > 0 && notFoundCount == 0 {
                         // Only removed files
