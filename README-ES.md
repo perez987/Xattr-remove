@@ -1,6 +1,10 @@
 # Xattr-remove
 
-![title](Resources/Images/AppIcon-96.png)
+![title](Images/AppIcon-96.png)
+
+<a href="README.md">
+    <img src="https://img.shields.io/badge/README-Inglés-blue" alt=“README inglés”>
+</a><br>
 
 Aplicación para macOS desarrollada con SwiftUI que elimina el atributo extendido `com.apple.quarantine` de los archivos descargados de internet. Funciona aceptando archivos mediante la función de arrastrar y soltar en la ventana de la aplicación.
 
