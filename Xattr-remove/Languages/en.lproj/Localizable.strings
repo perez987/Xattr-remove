@@ -22,7 +22,7 @@
 "success_removed_multiple" = "Successfully removed quarantine attribute from %d files";
 "success_not_present_single" = "Successfully processed 1 file (quarantine attribute was not present)";
 "success_not_present_multiple" = "Successfully processed %d files (quarantine attribute was not present)";
-"success_mixed" = "Successfully processed %d files (%d removed, %d already cleaned)";
+"success_mixed" = "Successfully processed %d files (com.apple.quarantine was present in %d and absent in %d)";
 
 /* Language Menu */
 "menu_language" = "Language";
