@@ -22,7 +22,7 @@
 "success_removed_multiple" = "Supprimé avec succès l'attribut com.apple.quarantine de %d fichiers";
 "success_not_present_single" = "Traité avec succès 1 fichier (com.apple.quarantine n'était pas présent)";
 "success_not_present_multiple" = "Traités avec succès %d fichiers (com.apple.quarantine n'était pas présent)";
-"success_mixed" = "Traités avec succès %d fichiers (%d supprimé(s), %d déjà nettoyé(s))";
+"success_mixed" = "Traités avec succès %d fichiers (%d avec com.apple.quarantine, %d sans com.apple.quarantine)";
 
 /* Language Menu */
 "menu_language" = "Langue";

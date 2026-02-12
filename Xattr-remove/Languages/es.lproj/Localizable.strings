@@ -22,7 +22,7 @@
 "success_removed_multiple" = "Se ha quitado com.apple.quarantine correctamente de %d archivos";
 "success_not_present_single" = "Un archivo procesado correctamente (com.apple.quarantine no estaba presente)";
 "success_not_present_multiple" = "%d archivos procesados correctamente (com.apple.quarantine no estaba presente)";
-"success_mixed" = "%d archivos procesados correctamente (%d eliminado(s), %d ya limpio(s))";
+"success_mixed" = "%d archivos procesados correctamente (%d con com.apple.quarantine, %d sin com.apple.quarantine)";
 
 /* Language Menu */
 "menu_language" = "Idioma";

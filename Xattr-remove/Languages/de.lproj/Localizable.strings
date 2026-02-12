@@ -22,7 +22,7 @@
 "success_removed_multiple" = "Quarantäne-Attribut erfolgreich von %d Dateien entfernt.";
 "success_not_present_single" = "1 Datei erfolgreich verarbeitet (Quarantäne-Attribut war nicht vorhanden)";
 "success_not_present_multiple" = "%d Dateien erfolgreich verarbeitet (Quarantäne-Attribut war nicht vorhanden)";
-"success_mixed" = "%d Dateien erfolgreich verarbeitet (%d entfernt, %d bereits bereinigt)";
+"success_mixed" = "%d Dateien erfolgreich verarbeitet (%d mit com.apple.quarantine, %d ohne com.apple.quarantine)";
 
 /* Language Menu */
 "menu_language" = "Sprache";
