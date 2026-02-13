@@ -31,12 +31,12 @@ struct ContentView: View {
                 .foregroundColor(.secondary)
         }
         .frame(
-            minWidth: 300,
-            idealWidth: 300,
-            maxWidth: 300,
-            minHeight: 300,
-            idealHeight: 300,
-            maxHeight: 300
+            minWidth: 320,
+            idealWidth: 320,
+            maxWidth: 320,
+            minHeight: 320,
+            idealHeight: 320,
+            maxHeight: 320
         )
         .background(isTargeted ? Color.blue.opacity(0.1) : Color.clear)
         // Note: macOS may log reentrant drag IPC messages in Xcode console during drag operations.

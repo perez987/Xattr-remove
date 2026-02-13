@@ -14,8 +14,8 @@ struct CustomAlertView: View {
     let message: String
     
     // Alert sizing constants
-    private let minWidth: CGFloat = 320
-    private let maxWidth: CGFloat = 320
+    private let minWidth: CGFloat = 300
+    private let maxWidth: CGFloat = 300
     private let minHeight: CGFloat = 200
     
     var body: some View {
