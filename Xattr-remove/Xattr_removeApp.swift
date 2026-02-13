@@ -9,8 +9,9 @@ import SwiftUI
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {
-        // This app does not use state restoration
-        false
+        // Return true to explicitly opt-in to secure coding, suppressing the warning.
+        // State restoration is still disabled via window.isRestorable = false below.
+        true
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {

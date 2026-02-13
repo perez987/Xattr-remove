@@ -12,6 +12,7 @@
 		2D0000010000000000000003 /* XattrManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0000020000000000000003 /* XattrManager.swift */; };
 		2D0000010000000000000004 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2D0000020000000000000004 /* Assets.xcassets */; };
 		2D0000010000000000000007 /* FileProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0000020000000000000007 /* FileProcessor.swift */; };
+		2D0000010000000000000008 /* CustomAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0000020000000000000008 /* CustomAlertView.swift */; };
 		2D0000020000000000000015 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2D0000020000000000000009 /* Localizable.strings */; };
 		D9F332902F3BBA51001CDDB0 /* LanguageSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9F3328F2F3BBA51001CDDB0 /* LanguageSelectorView.swift */; };
 /* End PBXBuildFile section */
@@ -25,6 +26,7 @@
 		2D0000020000000000000005 /* Xattr_remove.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Xattr_remove.entitlements; sourceTree = "<group>"; };
 		2D0000020000000000000006 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2D0000020000000000000007 /* FileProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileProcessor.swift; sourceTree = "<group>"; };
+		2D0000020000000000000008 /* CustomAlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomAlertView.swift; sourceTree = "<group>"; };
 		2D0000020000000000000010 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		2D0000020000000000000011 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		2D0000020000000000000012 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -96,6 +98,7 @@
 			isa = PBXGroup;
 			children = (
 				2D0000020000000000000002 /* ContentView.swift */,
+				2D0000020000000000000008 /* CustomAlertView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -169,6 +172,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2D0000010000000000000002 /* ContentView.swift in Sources */,
+				2D0000010000000000000008 /* CustomAlertView.swift in Sources */,
 				2D0000010000000000000007 /* FileProcessor.swift in Sources */,
 				D9F332902F3BBA51001CDDB0 /* LanguageSelectorView.swift in Sources */,
 				2D0000010000000000000003 /* XattrManager.swift in Sources */,
@@ -335,7 +339,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.3;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "yo.xattr-remove.app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -366,7 +370,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.3;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "yo.xattr-remove.app";
 				PRODUCT_NAME = "$(TARGET_NAME)";

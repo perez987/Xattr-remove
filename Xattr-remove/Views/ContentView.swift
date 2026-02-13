@@ -16,20 +16,6 @@ struct ContentView: View {
     // Logger for UI events
     private let logger = Logger(subsystem: "com.xattr-rm.app", category: "ContentView")
     
-    // Deferred binding prevents "Publishing changes from within view updates" warnings
-    // by deferring the set operation to the next run loop iteration via DispatchQueue.main.async,
-    // so SwiftUI's internal binding set-backs don't trigger objectWillChange during view updates.
-    private var alertIsPresented: Binding<Bool> {
-        Binding(
-            get: { fileProcessor.alertState.isPresented },
-            set: { newValue in
-                DispatchQueue.main.async {
-                    fileProcessor.alertState.isPresented = newValue
-                }
-            }
-        )
-    }
-    
     var body: some View {
         VStack(spacing: 20) {
             Image(systemName: "arrow.up.trash")
@@ -59,10 +45,11 @@ struct ContentView: View {
             handleDrop(providers: providers)
             return true
         }
-        .alert(fileProcessor.alertState.title, isPresented: alertIsPresented) {
-            Button(NSLocalizedString("ok_button", comment: "OK button"), role: .cancel) { }
-        } message: {
-            Text(fileProcessor.alertState.message)
+        .sheet(isPresented: $fileProcessor.alertState.isPresented) {
+            CustomAlertView(
+                title: fileProcessor.alertState.title,
+                message: fileProcessor.alertState.message
+            )
         }
     }
     
