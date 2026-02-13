@@ -40,6 +40,7 @@ class XattrManager {
         }
         
         // Attempt to remove the attribute using C API
+        // removexattr is a system function, part of Darwin's C standard library
         // Use XATTR_NOFOLLOW to not follow symbolic links
         let result = removexattr(path, quarantineAttribute, XATTR_NOFOLLOW)
         

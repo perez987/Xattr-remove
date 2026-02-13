@@ -54,4 +54,6 @@ Based on:
 
 - https://github.com/rcsiko/xattr-editor
 - https://github.com/perez987/Xattr-Editor
+- https://github.com/jozefizso/swift-xattr
+- https://github.com/overbuilt/foundation-xattr
 - https://github.com/abra-code/XattrApp
