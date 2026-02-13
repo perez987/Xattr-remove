@@ -35,7 +35,7 @@ Open `Xattr-remove.xcodeproj` in Xcode and build the project. The app requires m
 2. Drag and drop files that have the quarantine attribute onto the app window
 3. The quarantine attribute (if it exists) will be automatically removed
 4. The user gets an alert as feedback
-5. The app automatically quits 3 seconds after displaying a success alert
+5. The app automatically quits 4 seconds after displaying a success alert
 
 **Note:** Files must be dropped onto the app window. Dropping files onto the app icon in Finder or Dock is not supported due to macOS Gatekeeper restrictions with quarantined executables.
 
