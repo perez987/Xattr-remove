@@ -6,7 +6,7 @@ When you build and run a new app version from Xcode, macOS may continue using th
 - Clear the services cache by logging out and back in, or by running:
 
    ```bash
-   /System/Library/CoreServices/pbs -flush; /System/Library/CoreServices/pbs -update
+   /System/Library/CoreServices/pbs -flush;/System/Library/CoreServices/pbs -update
    ```
   
  - Build and run the app again from Xcode
