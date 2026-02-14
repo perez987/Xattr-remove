@@ -33,3 +33,6 @@
 "ok" = "OK";
 "language_changed_title" = "Language Changed";
 "language_changed_message" = "Please restart the application\nto apply the new language.";
+
+/* Finder Service */
+"finder_service_label" = "Clear Quarantine Attribute";

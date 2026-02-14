@@ -25,6 +25,14 @@ This app is a simpler and lighter version of [Xattr Editor](https://github.com/p
 - Localization system with language selector and 5 languages (German, English, French, Italian and Spanish)
 - Language selector: `Language` > `Select language` in menubar or `⌘ + L` keyboard shortcut 
 
+## Finder service
+
+- Adds a macOS Finder service so users can clear com.apple.quarantine directly from the right-click Services menu without drag-and-drop
+- macOS may require logout/login or run in Terminal `/System/Library/CoreServices/pbs -update` for the service to appear in the Finder
+- For more information, read the document [Update Xcode service](DOCS/Update Xcode service.md).
+
+![title](Images/Finder-service.png)
+
 ## Building
 
 Open `Xattr-remove.xcodeproj` in Xcode and build the project. The app requires macOS 13.0 or later.

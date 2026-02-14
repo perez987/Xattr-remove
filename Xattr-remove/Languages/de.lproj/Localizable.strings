@@ -33,3 +33,6 @@
 "ok" = "Akzeptieren";
 "language_changed_title" = "Sprache geändert";
 "language_changed_message" = "Bitte starten Sie die Anwendung neu,\num die neue Sprache anzuwenden.";
+
+/* Finder Service */
+"finder_service_label" = "Quarantäne-Attribut entfernen";
