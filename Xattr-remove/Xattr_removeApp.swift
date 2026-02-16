@@ -73,7 +73,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         // If launched from Finder service before applicationDidFinishLaunching,
         // ensure window is visible
-        if launchedFromService && !NSApp.windows.isEmpty {
+        if launchedFromService {
             logger.info("Service launch detected, ensuring window visibility")
             bringAppToForeground()
         }
