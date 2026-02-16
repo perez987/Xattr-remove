@@ -117,8 +117,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         logger.info("ContentView appeared, enforcing window visibility for service launch")
         
-        // At this point, the window exists (we're in onAppear), so just bring it to front
-        bringAppToForeground()
+        // On Sequoia/Tahoe, even after onAppear, the window may not be fully initialized
+        // Add a small delay to ensure the window is fully ready before forcing visibility
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
+            self?.bringAppToForeground()
+        }
     }
 
     // Brings the app window to the foreground so the user can see the result alert.
@@ -154,6 +157,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 window.deminiaturize(nil)
             }
             
+            // Center the window on screen to ensure it's visible
+            window.center()
+            
             // Set to floating level temporarily for maximum visibility
             window.level = .floating
             
@@ -166,6 +172,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             
             // Make it key and main
             window.makeKeyAndOrderFront(nil)
+            
+            // Additional step: make the window key
+            window.makeKey()
         }
         
         // Reset window level after ensuring visibility
