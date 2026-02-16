@@ -73,9 +73,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         // If launched from Finder service before applicationDidFinishLaunching,
         // ensure window is visible
-        if launchedFromService && !NSApp.windows.isEmpty {
-            logger.info("Service launch detected, ensuring window visibility")
-            bringAppToForeground()
+        if launchedFromService {
+            self.logger.info("Service launch detected, ensuring window visibility")
+            // bringAppToForeground handles polling if SwiftUI hasn't created windows yet.
+            self.bringAppToForeground()
         }
     }
     // Finder Service Handler
