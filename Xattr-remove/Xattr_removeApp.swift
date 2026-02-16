@@ -40,6 +40,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // Flag to track if we're launched from Finder service
     private var launchedFromService = false
 
+    /// Called before applicationDidFinishLaunching to set up critical app configuration.
+    /// On macOS Tahoe, services provider and activation policy MUST be registered here
+    /// (not in applicationDidFinishLaunching) because:
+    /// 1. Finder service handler may be invoked before applicationDidFinishLaunching completes
+    /// 2. SwiftUI WindowGroup requires activation policy to be set before window creation
+    /// 3. Early setup ensures app is ready to show windows when service is invoked
     func applicationWillFinishLaunching(_ notification: Notification) {
         // Register services provider early - this is critical for Finder services
         NSApp.servicesProvider = self
@@ -176,11 +182,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 // with a longer delay to give SwiftUI more time on Tahoe
                 NSApp.activate(ignoringOtherApps: true)
                 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                DispatchQueue.main.asyncAfter(deadline: .now() + self.windowInitializationDelay) { [weak self] in
                     guard let self = self else { return }
                     if NSApp.windows.isEmpty {
                         self.logger.error("No windows created by SwiftUI WindowGroup after all attempts")
-                        // As a last resort, try requesting the main menu to trigger window creation
+                        // Last resort: Access mainMenu to trigger app infrastructure initialization
+                        // This can sometimes force SwiftUI to evaluate its scene hierarchy on Tahoe
                         _ = NSApp.mainMenu
                         NSApp.activateIgnoringOtherApps(true)
                     } else {
