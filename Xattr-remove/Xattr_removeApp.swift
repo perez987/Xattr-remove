@@ -156,12 +156,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         if NSApp.windows.isEmpty {
             if windowCreationRetryCount < maxWindowCreationRetries {
-                logger.warning("Retry \(windowCreationRetryCount)/\(maxWindowCreationRetries): No windows exist, waiting...")
+                logger.warning("Retry \(self.windowCreationRetryCount)/\(self.maxWindowCreationRetries): No windows exist, waiting...")
                 DispatchQueue.main.asyncAfter(deadline: .now() + windowCreationRetryDelay) { [weak self] in
                     self?.showAllWindowsWithRetry()
                 }
             } else {
-                logger.error("Failed to create windows after \(maxWindowCreationRetries) retries")
+                logger.error("Failed to create windows after \(self.maxWindowCreationRetries) retries")
             }
         } else {
             showAllWindows()
