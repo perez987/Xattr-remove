@@ -11,9 +11,11 @@ import os.log
 class AppDelegate: NSObject, NSApplicationDelegate {
     private let logger = Logger(subsystem: "com.xattr-rm.app", category: "AppDelegate")
 
-    // Timing constant for window visibility
+    // Timing constants for window visibility
     // windowLevelResetDelay: Keep window elevated briefly to ensure visibility, then restore normal level
     private let windowLevelResetDelay: TimeInterval = 0.2
+    // windowInitializationDelay: Wait after onAppear for window to be fully ready on Sequoia/Tahoe
+    private let windowInitializationDelay: TimeInterval = 0.05
 
     // Reference to the FileProcessor, set by the SwiftUI App when the view appears.
     // Allows the Finder service handler to reuse existing processing and alert logic.
@@ -117,8 +119,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         logger.info("ContentView appeared, enforcing window visibility for service launch")
         
-        // At this point, the window exists (we're in onAppear), so just bring it to front
-        bringAppToForeground()
+        // On Sequoia/Tahoe, even after onAppear, the window may not be fully initialized
+        // Add a small delay to ensure the window is fully ready before forcing visibility
+        DispatchQueue.main.asyncAfter(deadline: .now() + windowInitializationDelay) { [weak self] in
+            self?.bringAppToForeground()
+        }
     }
 
     // Brings the app window to the foreground so the user can see the result alert.
@@ -154,6 +159,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 window.deminiaturize(nil)
             }
             
+            // Center the window on screen to ensure it's visible
+            window.center()
+            
             // Set to floating level temporarily for maximum visibility
             window.level = .floating
             
@@ -166,6 +174,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             
             // Make it key and main
             window.makeKeyAndOrderFront(nil)
+            
+            // On Sequoia/Tahoe, makeKeyAndOrderFront() alone is insufficient to activate the window
+            // Explicit makeKey() ensures keyboard focus
+            window.makeKey()
         }
         
         // Reset window level after ensuring visibility
