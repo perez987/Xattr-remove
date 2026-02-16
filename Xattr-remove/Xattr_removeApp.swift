@@ -16,6 +16,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private let activationDelay: TimeInterval = 0.1
     // windowLevelResetDelay: Keep window elevated briefly to ensure visibility, then restore normal level
     private let windowLevelResetDelay: TimeInterval = 0.2
+    // windowInitializationDelay: Wait for SwiftUI window to be created when launched from service
+    private let windowInitializationDelay: TimeInterval = 0.05
 
     // Reference to the FileProcessor, set by the SwiftUI App when the view appears.
     // Allows the Finder service handler to reuse existing processing and alert logic.
@@ -64,13 +66,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         logger.info("Finder service: received \(urls.count) file(s)")
 
         DispatchQueue.main.async {
-            // First, ensure windows are created and ready
-            // Force window update on macOS Tahoe by accessing windows array
+            // Accessing NSApp.windows forces AppKit to update its window list, which is
+            // necessary on macOS Tahoe to ensure SwiftUI windows are recognized
             _ = NSApp.windows
             
             // Small delay to allow SwiftUI window to fully initialize
             // This is critical for macOS Tahoe when launched from Finder service
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + self.windowInitializationDelay) {
                 // Bring the app window to the foreground when invoked from the Finder service
                 self.bringAppToForeground()
 
@@ -131,11 +133,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         // Strategy 6: Reset window level after ensuring visibility
         // The immediate floating level ensures the window appears, this resets it to normal
+        // Using weak capture to handle windows that may be closed during the delay
+        let windowsToReset = NSApp.windows.compactMap { window -> NSWindow? in
+            return window
+        }
         DispatchQueue.main.asyncAfter(deadline: .now() + windowLevelResetDelay) {
-            for window in NSApp.windows {
-                if NSApp.windows.contains(window) {
-                    window.level = .normal
-                }
+            for window in windowsToReset where NSApp.windows.contains(window) {
+                window.level = .normal
             }
         }
     }
