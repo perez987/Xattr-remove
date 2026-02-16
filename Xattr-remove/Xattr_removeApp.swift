@@ -70,9 +70,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             // necessary on macOS Tahoe to ensure SwiftUI windows are recognized
             _ = NSApp.windows
             
-            // Small delay to allow SwiftUI window to fully initialize
+            // On macOS Tahoe, when launched from Finder service, SwiftUI WindowGroup
+            // may not create windows until the app is fully activated. We need to:
+            // 1. Activate the app FIRST to trigger window creation
+            // 2. Wait longer for SwiftUI to create the window
+            // 3. Then try to show the window
+            
+            // Force activation immediately to trigger SwiftUI window creation
+            NSApp.setActivationPolicy(.regular)
+            NSRunningApplication.current.activate(options: [.activateAllWindows, .activateIgnoringOtherApps])
+            NSApp.activate(ignoringOtherApps: true)
+            
+            // Longer delay to allow SwiftUI window to fully initialize after activation
             // This is critical for macOS Tahoe when launched from Finder service
-            DispatchQueue.main.asyncAfter(deadline: .now() + self.windowInitializationDelay) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 // Bring the app window to the foreground when invoked from the Finder service
                 self.bringAppToForeground()
 
@@ -113,8 +124,31 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Strategy 4: Activate the NSApplication itself
         NSApp.activate(ignoringOtherApps: true)
         
-        // Strategy 5: Immediately show all windows with maximum visibility settings
-        // This is critical for macOS Tahoe where windows may be hidden by default
+        // Strategy 5: Check if windows exist and show them
+        // On macOS Tahoe, SwiftUI WindowGroup may not create windows when launched from service
+        if NSApp.windows.isEmpty {
+            logger.warning("No windows exist after activation, waiting for window creation")
+            
+            // Wait a bit more and try again recursively
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                self?.showAllWindows()
+            }
+        } else {
+            // Windows exist, show them immediately
+            showAllWindows()
+        }
+    }
+    
+    // Helper method to show and activate all windows
+    private func showAllWindows() {
+        guard !NSApp.windows.isEmpty else {
+            logger.warning("showAllWindows called but no windows exist")
+            return
+        }
+        
+        logger.info("Showing \(NSApp.windows.count) window(s)")
+        
+        // Iterate all windows and make them visible with maximum visibility settings
         for window in NSApp.windows {
             // If window is miniaturized, deminiaturize it
             if window.isMiniaturized {
@@ -131,8 +165,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             window.makeKeyAndOrderFront(nil)
         }
         
-        // Strategy 6: Reset window level after ensuring visibility
-        // The immediate floating level ensures the window appears, this resets it to normal
+        // Reset window level after ensuring visibility
         // Using weak capture to handle windows that may be closed during the delay
         let windowsToReset = NSApp.windows.compactMap { window -> NSWindow? in
             return window
