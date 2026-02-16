@@ -189,7 +189,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                         // Last resort: Access mainMenu to trigger app infrastructure initialization
                         // This can sometimes force SwiftUI to evaluate its scene hierarchy on Tahoe
                         _ = NSApp.mainMenu
-                        NSApp.activateIgnoringOtherApps(true)
+                        NSApp.activate(ignoringOtherApps: true)
                     } else {
                         self.logger.info("Window finally created after extended wait")
                         self.showAllWindows()
@@ -212,7 +212,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         // First, ensure the app itself is fully visible
         NSApp.unhide(nil)
-        NSApp.activateIgnoringOtherApps(true)
+        NSApp.activate(ignoringOtherApps: true)
         
         // Iterate all windows and make them visible with maximum visibility settings
         for window in NSApp.windows {
