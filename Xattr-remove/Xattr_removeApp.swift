@@ -80,11 +80,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             
             // On macOS Tahoe, when launched from Finder service, SwiftUI WindowGroup
             // may not create windows until the app is fully activated. We need to:
-            // 1. Activate the app FIRST to trigger window creation
-            // 2. Wait longer for SwiftUI to create the window
-            // 3. Then try to show the window
+            // 1. Unhide the app FIRST (apps launched from services may start hidden on Tahoe)
+            // 2. Activate the app to trigger window creation
+            // 3. Wait longer for SwiftUI to create the window
+            // 4. Then try to show the window
             
-            // Force activation immediately to trigger SwiftUI window creation
+            // Strategy 1: Unhide the app FIRST, before any activation
+            // This is critical for macOS Tahoe - apps launched from services start hidden
+            if NSApp.isHidden {
+                NSApp.unhide(nil)
+            }
+            
+            // Strategy 2: Force activation immediately to trigger SwiftUI window creation
             NSApp.setActivationPolicy(.regular)
             NSRunningApplication.current.activate(options: [.activateAllWindows, .activateIgnoringOtherApps])
             NSApp.activate(ignoringOtherApps: true)
