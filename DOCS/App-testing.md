@@ -121,6 +121,29 @@ After completing all scenarios, verify:
 - [ ] App remains responsive throughout all operations
 - [ ] Console logs show appropriate information for debugging
 
+### Finder Service Testing (macOS Version-Specific)
+
+The Finder service availability depends on your macOS version:
+
+**On macOS Sonoma (14.x) and earlier:**
+- [ ] Finder service appears in Services menu when right-clicking files
+- [ ] Service launches the app and processes files correctly
+- [ ] Window becomes visible when service is invoked
+- [ ] Check console logs show: "Finder service registered (macOS 14)"
+
+**On macOS Sequoia (15.x) and Tahoe (16.x):**
+- [ ] Finder service does NOT appear in Services menu (expected behavior)
+- [ ] Check console logs show: "Finder service disabled on macOS 15.x (Sequoia/Tahoe or later) due to window visibility issues"
+- [ ] Drag-and-drop functionality remains fully functional
+
+**To test the Finder service on supported versions:**
+1. Build and run the app in Xcode
+2. Update the services cache: `/System/Library/CoreServices/pbs -flush;/System/Library/CoreServices/pbs -update`
+3. Right-click on downloaded files in Finder
+4. Look for "⎋ com.apple.quarantine" in the Services submenu
+5. Select the service and verify the app launches with window visible
+6. Verify files are processed and alert appears
+
 ## Console Output
 
 When running from Xcode, you should see console logs like:

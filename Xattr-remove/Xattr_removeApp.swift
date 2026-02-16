@@ -14,7 +14,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // Timing constants for window visibility
     // windowLevelResetDelay: Keep window elevated briefly to ensure visibility, then restore normal level
     private let windowLevelResetDelay: TimeInterval = 0.2
-    // windowInitializationDelay: Wait after onAppear for window to be fully ready on Sequoia/Tahoe
+    // windowInitializationDelay: Brief delay after showing windows to ensure focus is maintained
     private let windowInitializationDelay: TimeInterval = 0.05
 
     // Reference to the FileProcessor, set by the SwiftUI App when the view appears.
@@ -31,6 +31,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     // Flag to track if window visibility has been enforced after creation
     private var windowVisibilityEnforced = false
+    
+    /// Check if Finder service should be enabled based on macOS version.
+    /// On macOS Sequoia (15.0) and Tahoe (16.0), the Finder service has persistent
+    /// window visibility issues that cannot be reliably fixed. The service is disabled
+    /// on these versions to provide a better user experience.
+    /// Returns true if macOS version is 14.x (Sonoma) or earlier.
+    private var isFinderServiceSupported: Bool {
+        let osVersion = ProcessInfo.processInfo.operatingSystemVersion
+        // Disable service on macOS 15.0+ (Sequoia, Tahoe, and later)
+        return osVersion.majorVersion < 15
+    }
 
     /// Called before applicationDidFinishLaunching to set up critical app configuration.
     /// On macOS Tahoe, services provider and activation policy MUST be registered here
@@ -38,9 +49,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     /// 1. Finder service handler may be invoked before applicationDidFinishLaunching completes
     /// 2. SwiftUI WindowGroup requires activation policy to be set before window creation
     /// 3. Early setup ensures app is ready to show windows when service is invoked
+    ///
+    /// However, on macOS Sequoia (15.0) and later, the Finder service has persistent
+    /// window visibility issues. The service is conditionally disabled on these versions.
     func applicationWillFinishLaunching(_ notification: Notification) {
-        // Register services provider early - this is critical for Finder services
-        NSApp.servicesProvider = self
+        // Only register services provider on supported macOS versions (Sonoma and earlier)
+        if isFinderServiceSupported {
+            NSApp.servicesProvider = self
+            logger.info("Finder service registered (macOS \(ProcessInfo.processInfo.operatingSystemVersion.majorVersion))")
+        } else {
+            logger.warning("Finder service disabled on macOS \(ProcessInfo.processInfo.operatingSystemVersion.majorVersion).x (Sequoia/Tahoe or later) due to window visibility issues")
+        }
         
         // Set activation policy early to ensure app can come to foreground
         // This must happen BEFORE any service invocation on macOS Tahoe
@@ -68,7 +87,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // Called by macOS when the user invokes "Clear Quarantine Attribute" from the
     // Finder Services menu. Receives file paths via the pasteboard and forwards
     // them to `FileProcessor` for quarantine attribute removal.
+    //
+    // NOTE: This service is only available on macOS Sonoma (14.x) and earlier.
+    // On macOS Sequoia (15.0) and later, the service is disabled due to unresolved
+    // window visibility issues. Users on these versions should use drag-and-drop instead.
     @objc func removeQuarantine(_ pboard: NSPasteboard, userData: String, error: AutoreleasingUnsafeMutablePointer<NSString>) {
+        // Check if service should be available on this macOS version
+        guard isFinderServiceSupported else {
+            logger.error("Finder service invoked on unsupported macOS version \(ProcessInfo.processInfo.operatingSystemVersion.majorVersion)")
+            error.pointee = "Service not available on this macOS version" as NSString
+            return
+        }
+        
         guard let filePaths = pboard.propertyList(
             forType: NSPasteboard.PasteboardType("NSFilenamesPboardType")
         ) as? [String], !filePaths.isEmpty else {
@@ -110,8 +140,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     // Called from ContentView.onAppear to ensure window is visible when launched from service.
-    // This is the key fix for Sequoia/Tahoe: enforce window visibility AFTER SwiftUI creates
-    // the window, not before. The window exists at this point, we just need to bring it front.
+    // This is the key fix for older macOS versions where window visibility can be enforced:
+    // enforce visibility AFTER SwiftUI creates the window, not before. The window exists at 
+    // this point, we just need to bring it front.
+    // Note: On macOS Sequoia (15.0+), the Finder service is disabled entirely, so this code
+    // primarily benefits macOS Sonoma (14.x) and earlier.
     func ensureWindowVisibilityAfterCreation() {
         // Only enforce visibility once, and only if launched from service
         guard launchedFromService, !windowVisibilityEnforced else { return }
@@ -119,9 +152,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         logger.info("ContentView appeared, enforcing window visibility for service launch")
         
-        // CRITICAL FIX for Sequoia/Tahoe: Show windows IMMEDIATELY, without delay
+        // CRITICAL FIX: Show windows IMMEDIATELY, without delay
         // The delay was causing the app to lose activation before windows could be shown
-        // On Sequoia/Tahoe, we must show windows synchronously in the same run loop as onAppear
+        // For service launches, we must show windows synchronously in the same run loop as onAppear
         showAllWindows()
         
         // Then do a secondary activation after a brief delay to ensure focus is maintained
@@ -169,6 +202,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 window.deminiaturize(nil)
             }
             
+            // CRITICAL FIX for Sequoia/Tahoe: Set collection behavior to prevent window from being hidden
+            // This ensures the window participates in Exposé and Spaces properly
+            window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+            
+            // Ensure window is visible by setting it not hidden
+            window.setIsVisible(true)
+            
             // Center the window on screen to ensure it's visible
             window.center()
             
@@ -190,11 +230,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             window.makeKey()
         }
         
-        // Reset window level after ensuring visibility
+        // Reset window level and collection behavior after ensuring visibility.
+        // This delayed reset restores normal window management behavior after the
+        // temporary floating level has served its purpose of forcing visibility.
         let windowsToReset = NSApp.windows
         DispatchQueue.main.asyncAfter(deadline: .now() + windowLevelResetDelay) {
             for window in windowsToReset where NSApp.windows.contains(window) {
                 window.level = .normal
+                // Reset collection behavior to default to restore standard window management
+                window.collectionBehavior = .default
             }
         }
     }
