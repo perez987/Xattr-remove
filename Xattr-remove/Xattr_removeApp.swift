@@ -17,12 +17,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // windowLevelResetDelay: Keep window elevated briefly to ensure visibility, then restore normal level
     private let windowLevelResetDelay: TimeInterval = 0.2
     // windowInitializationDelay: Wait for SwiftUI window to be created after activation from service
-    // Increased to 0.2s on macOS Tahoe to allow WindowGroup sufficient time to create window
-    private let windowInitializationDelay: TimeInterval = 0.2
+    // Significantly increased for macOS Tahoe to allow WindowGroup sufficient time to create window
+    // Tahoe appears to need more time than Sonoma for SwiftUI window initialization
+    private let windowInitializationDelay: TimeInterval = 0.5
     // windowCreationRetryDelay: Wait before retrying if windows don't exist
-    private let windowCreationRetryDelay: TimeInterval = 0.1
+    private let windowCreationRetryDelay: TimeInterval = 0.2
     // Maximum attempts to find/create windows before giving up
-    private let maxWindowCreationRetries = 3
+    private let maxWindowCreationRetries = 5
 
     // Reference to the FileProcessor, set by the SwiftUI App when the view appears.
     // Allows the Finder service handler to reuse existing processing and alert logic.
@@ -171,6 +172,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             } else {
                 logger.error("Failed to create windows after \(self.maxWindowCreationRetries) retries")
+                // Final attempt: Force window creation by calling NSApp.activate one more time
+                // with a longer delay to give SwiftUI more time on Tahoe
+                NSApp.activate(ignoringOtherApps: true)
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                    guard let self = self else { return }
+                    if NSApp.windows.isEmpty {
+                        self.logger.error("No windows created by SwiftUI WindowGroup after all attempts")
+                        // As a last resort, try requesting the main menu to trigger window creation
+                        _ = NSApp.mainMenu
+                        NSApp.activateIgnoringOtherApps(true)
+                    } else {
+                        self.logger.info("Window finally created after extended wait")
+                        self.showAllWindows()
+                    }
+                }
             }
         } else {
             showAllWindows()
