@@ -35,6 +35,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     // Track retry attempts for window creation
     private var windowCreationRetryCount = 0
+    
+    // Flag to track if we're launched from Finder service
+    private var launchedFromService = false
+
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        // Register services provider early - this is critical for Finder services
+        NSApp.servicesProvider = self
+        
+        // Set activation policy early to ensure app can come to foreground
+        // This must happen BEFORE any service invocation on macOS Tahoe
+        NSApp.setActivationPolicy(.regular)
+    }
 
     func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {
         // Return true to explicitly opt-in to secure coding, suppressing the warning.
@@ -43,10 +55,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // Register this object as the Finder services provider so macOS
-        // delivers the "Clear Quarantine Attribute" service message here.
-        NSApp.servicesProvider = self
-
         // Disable window state restoration to prevent
         // _NSPersistentUIDeleteItemAtFileURL console warnings.
         // Deferred to ensure SwiftUI windows are created.
@@ -54,6 +62,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             for window in NSApplication.shared.windows {
                 window.isRestorable = false
             }
+        }
+        
+        // If launched from Finder service before applicationDidFinishLaunching,
+        // ensure window is visible
+        if launchedFromService && !NSApp.windows.isEmpty {
+            logger.info("Service launch detected, ensuring window visibility")
+            bringAppToForeground()
         }
     }
     // Finder Service Handler
@@ -72,32 +87,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         let urls = filePaths.map { URL(fileURLWithPath: $0) }
         logger.info("Finder service: received \(urls.count) file(s)")
+        
+        // Mark that we're launched from service
+        launchedFromService = true
 
+        // On macOS Tahoe, apps launched from Finder services start hidden and
+        // SwiftUI WindowGroup doesn't create windows until the app is fully initialized.
+        // Solution: Activate synchronously BEFORE any async operations to force immediate
+        // window creation, then handle window visibility.
+        
+        // CRITICAL: Unhide and activate SYNCHRONOUSLY before any async work
+        // This forces macOS to initialize the app and create SwiftUI windows immediately
+        NSApp.unhide(nil)
+        NSApp.activate(ignoringOtherApps: true)
+        NSRunningApplication.current.activate(options: [.activateAllWindows, .activateIgnoringOtherApps])
+        
+        // Now proceed with async handling
         DispatchQueue.main.async {
-            // Accessing NSApp.windows forces AppKit to update its window list, which is
-            // necessary on macOS Tahoe to ensure SwiftUI windows are recognized
-            _ = NSApp.windows
-            
-            // On macOS Tahoe, when launched from Finder service, SwiftUI WindowGroup
-            // may not create windows until the app is fully activated. We need to:
-            // 1. Unhide the app FIRST (apps launched from services may start hidden on Tahoe)
-            // 2. Activate the app to trigger window creation
-            // 3. Wait longer for SwiftUI to create the window
-            // 4. Then try to show the window
-            
-            // Strategy 1: Unhide the app FIRST, before any activation
-            // This is critical for macOS Tahoe - apps launched from services start hidden
-            NSApp.unhide(nil)
-            
-            // Strategy 2: Force activation immediately to trigger SwiftUI window creation
-            NSApp.setActivationPolicy(.regular)
-            NSRunningApplication.current.activate(options: [.activateAllWindows, .activateIgnoringOtherApps])
-            NSApp.activate(ignoringOtherApps: true)
-            
-            // Longer delay to allow SwiftUI window to fully initialize after activation
-            // This is critical for macOS Tahoe when launched from Finder service
+            // Give SwiftUI time to create and initialize windows after activation
             DispatchQueue.main.asyncAfter(deadline: .now() + self.windowInitializationDelay) {
-                // Bring the app window to the foreground when invoked from the Finder service
+                // Bring the app window to the foreground
                 self.bringAppToForeground()
 
                 if let processor = self.fileProcessor {
@@ -129,16 +138,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // This must happen synchronously and immediately for macOS Tahoe
         NSApp.unhide(nil)
         
-        // Strategy 2: Set activation policy to regular to ensure app can come to foreground
-        NSApp.setActivationPolicy(.regular)
-        
-        // Strategy 3: Use NSRunningApplication for more forceful activation
+        // Strategy 2: Use NSRunningApplication for more forceful activation
         NSRunningApplication.current.activate(options: [.activateAllWindows, .activateIgnoringOtherApps])
 
-        // Strategy 4: Activate the NSApplication itself
+        // Strategy 3: Activate the NSApplication itself
         NSApp.activate(ignoringOtherApps: true)
         
-        // Strategy 5: Check if windows exist and show them
+        // Strategy 4: Check if windows exist and show them
         // On macOS Tahoe, SwiftUI WindowGroup may not create windows when launched from service
         if NSApp.windows.isEmpty {
             logger.warning("No windows exist after activation, waiting for window creation")
