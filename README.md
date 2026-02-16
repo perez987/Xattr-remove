@@ -28,6 +28,7 @@ This app is a simpler and lighter version of [Xattr Editor](https://github.com/p
 ## Finder service
 
 - Adds a macOS Finder service so users can clear com.apple.quarantine directly from the right-click Services menu without drag-and-drop
+- **Important:** The Finder service is only available on **macOS Sonoma (14.x) and earlier**. On macOS Sequoia (15.x) and Tahoe (16.x), the service is disabled due to persistent window visibility issues. Users on these newer versions should use the drag-and-drop functionality instead.
 - macOS may require logout/login or run in Terminal `/System/Library/CoreServices/pbs -update` for the service to appear in the Finder
 - For more information, read the document [Update-Xcode-service](DOCS/Update-Xcode-service.md).
 

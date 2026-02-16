@@ -31,6 +31,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     // Flag to track if window visibility has been enforced after creation
     private var windowVisibilityEnforced = false
+    
+    /// Check if Finder service should be enabled based on macOS version.
+    /// On macOS Sequoia (15.0) and Tahoe (16.0), the Finder service has persistent
+    /// window visibility issues that cannot be reliably fixed. The service is disabled
+    /// on these versions to provide a better user experience.
+    /// Returns true if macOS version is 14.x (Sonoma) or earlier.
+    private var isFinderServiceSupported: Bool {
+        let osVersion = ProcessInfo.processInfo.operatingSystemVersion
+        // Disable service on macOS 15.0+ (Sequoia, Tahoe, and later)
+        return osVersion.majorVersion < 15
+    }
 
     /// Called before applicationDidFinishLaunching to set up critical app configuration.
     /// On macOS Tahoe, services provider and activation policy MUST be registered here
@@ -38,9 +49,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     /// 1. Finder service handler may be invoked before applicationDidFinishLaunching completes
     /// 2. SwiftUI WindowGroup requires activation policy to be set before window creation
     /// 3. Early setup ensures app is ready to show windows when service is invoked
+    ///
+    /// However, on macOS Sequoia (15.0) and later, the Finder service has persistent
+    /// window visibility issues. The service is conditionally disabled on these versions.
     func applicationWillFinishLaunching(_ notification: Notification) {
-        // Register services provider early - this is critical for Finder services
-        NSApp.servicesProvider = self
+        // Only register services provider on supported macOS versions (Sonoma and earlier)
+        if isFinderServiceSupported {
+            NSApp.servicesProvider = self
+            logger.info("Finder service registered (macOS \(ProcessInfo.processInfo.operatingSystemVersion.majorVersion))")
+        } else {
+            logger.warning("Finder service disabled on macOS \(ProcessInfo.processInfo.operatingSystemVersion.majorVersion).x (Sequoia/Tahoe or later) due to window visibility issues")
+        }
         
         // Set activation policy early to ensure app can come to foreground
         // This must happen BEFORE any service invocation on macOS Tahoe
@@ -68,7 +87,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // Called by macOS when the user invokes "Clear Quarantine Attribute" from the
     // Finder Services menu. Receives file paths via the pasteboard and forwards
     // them to `FileProcessor` for quarantine attribute removal.
+    //
+    // NOTE: This service is only available on macOS Sonoma (14.x) and earlier.
+    // On macOS Sequoia (15.0) and later, the service is disabled due to unresolved
+    // window visibility issues. Users on these versions should use drag-and-drop instead.
     @objc func removeQuarantine(_ pboard: NSPasteboard, userData: String, error: AutoreleasingUnsafeMutablePointer<NSString>) {
+        // Check if service should be available on this macOS version
+        guard isFinderServiceSupported else {
+            logger.error("Finder service invoked on unsupported macOS version \(ProcessInfo.processInfo.operatingSystemVersion.majorVersion)")
+            error.pointee = "Service not available on this macOS version" as NSString
+            return
+        }
+        
         guard let filePaths = pboard.propertyList(
             forType: NSPasteboard.PasteboardType("NSFilenamesPboardType")
         ) as? [String], !filePaths.isEmpty else {
@@ -169,6 +199,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 window.deminiaturize(nil)
             }
             
+            // CRITICAL FIX for Sequoia/Tahoe: Set collection behavior to prevent window from being hidden
+            // This ensures the window participates in Exposé and Spaces properly
+            window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+            
+            // Ensure window is visible by setting it not hidden
+            window.setIsVisible(true)
+            
             // Center the window on screen to ensure it's visible
             window.center()
             
@@ -195,6 +232,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         DispatchQueue.main.asyncAfter(deadline: .now() + windowLevelResetDelay) {
             for window in windowsToReset where NSApp.windows.contains(window) {
                 window.level = .normal
+                // Reset collection behavior to default
+                window.collectionBehavior = .default
             }
         }
     }

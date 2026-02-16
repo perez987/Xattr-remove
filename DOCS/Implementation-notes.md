@@ -187,6 +187,34 @@ Window visibility is now enforced AFTER we KNOW the window exists - in ContentVi
 - `bringAppToForeground()`: Activates app and shows windows
 - `showAllWindows()`: Applies aggressive visibility settings
 
+### Final Resolution (v1.4+)
+Despite multiple attempts to fix window visibility issues on macOS Sequoia (15.x) and Tahoe (16.x), including:
+- Various timing delays and retry logic
+- Multiple window activation strategies (orderFrontRegardless, floating level, etc.)
+- SwiftUI lifecycle-based approaches
+- Window collection behavior modifications
+
+The Finder service window visibility remains unreliable on these newer macOS versions. The root cause appears to be fundamental changes in how macOS handles window activation from background services in Sequoia and later.
+
+**Current Solution:**
+- The Finder service is now **conditionally disabled** on macOS 15.0+ (Sequoia, Tahoe, and later)
+- Service registration is checked via `isFinderServiceSupported` property
+- On Sequoia+, `NSApp.servicesProvider` is not set, effectively disabling the service
+- Users on these versions are directed to use the drag-and-drop functionality instead
+- The service remains fully functional on macOS Sonoma (14.x) and earlier
+
+**Code Changes:**
+- Added `isFinderServiceSupported` property to check macOS version
+- Modified `applicationWillFinishLaunching` to conditionally register the service
+- Added version check in `removeQuarantine` service handler as additional safety
+- Updated documentation (README.md, README-ES.md) to inform users of the limitation
+
+**User Impact:**
+- macOS Sonoma (14.x) and earlier: Finder service works as before
+- macOS Sequoia (15.x) and Tahoe (16.x): Service not available, use drag-and-drop instead
+- Clear documentation helps users understand the limitation
+- Drag-and-drop remains fully functional on all supported macOS versions
+
 ## Conclusion
 
 The implementation successfully addresses all requirements:
