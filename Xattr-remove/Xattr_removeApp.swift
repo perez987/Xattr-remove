@@ -97,7 +97,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Strategy 3: Activate the NSApplication itself
         NSApp.activate(ignoringOtherApps: true)
         
-        // Strategy 4: Bring window to front with a slight delay to ensure activation completes
+        // Strategy 4: Immediately unhide and show window before delayed activation
+        // This is critical for macOS Tahoe where the window may be hidden by default
+        if let window = NSApp.windows.first {
+            // Unhide the application if it's hidden
+            if NSApp.isHidden {
+                NSApp.unhide(nil)
+            }
+            
+            // If window is miniaturized, deminiaturize it
+            if window.isMiniaturized {
+                window.deminiaturize(nil)
+            }
+            
+            // Use orderFrontRegardless which is more forceful than makeKeyAndOrderFront
+            window.orderFrontRegardless()
+        }
+        
+        // Strategy 5: Bring window to front with a slight delay to ensure activation completes
         DispatchQueue.main.asyncAfter(deadline: .now() + activationDelay) { [weak self] in
             guard let self = self else { return }
             let resetDelay = self.windowLevelResetDelay
