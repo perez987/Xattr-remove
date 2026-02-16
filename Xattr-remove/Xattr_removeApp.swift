@@ -119,8 +119,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         logger.info("ContentView appeared, enforcing window visibility for service launch")
         
-        // On Sequoia/Tahoe, even after onAppear, the window may not be fully initialized
-        // Add a small delay to ensure the window is fully ready before forcing visibility
+        // CRITICAL FIX for Sequoia/Tahoe: Show windows IMMEDIATELY, without delay
+        // The delay was causing the app to lose activation before windows could be shown
+        // On Sequoia/Tahoe, we must show windows synchronously in the same run loop as onAppear
+        showAllWindows()
+        
+        // Then do a secondary activation after a brief delay to ensure focus is maintained
         DispatchQueue.main.asyncAfter(deadline: .now() + windowInitializationDelay) { [weak self] in
             self?.bringAppToForeground()
         }
@@ -139,8 +143,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Strategy 3: Activate the NSApplication itself
         NSApp.activate(ignoringOtherApps: true)
         
-        // Strategy 4: Make all windows visible
-        showAllWindows()
+        // Strategy 4: Re-show all windows to maintain visibility
+        // Note: This is called after initial showAllWindows() to reinforce window visibility
+        for window in NSApp.windows {
+            window.makeKeyAndOrderFront(nil)
+        }
     }
     
     // Helper method to show and activate all windows
