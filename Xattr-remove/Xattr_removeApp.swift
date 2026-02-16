@@ -64,14 +64,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         logger.info("Finder service: received \(urls.count) file(s)")
 
         DispatchQueue.main.async {
-            // Bring the app window to the foreground when invoked from the Finder service
-            self.bringAppToForeground()
+            // First, ensure windows are created and ready
+            // Force window update on macOS Tahoe by accessing windows array
+            _ = NSApp.windows
+            
+            // Small delay to allow SwiftUI window to fully initialize
+            // This is critical for macOS Tahoe when launched from Finder service
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                // Bring the app window to the foreground when invoked from the Finder service
+                self.bringAppToForeground()
 
-            if let processor = self.fileProcessor {
-                processor.processFiles(urls)
-            } else {
-                // App may still be setting up SwiftUI; buffer URLs until ready.
-                self.pendingServiceURLs.append(contentsOf: urls)
+                if let processor = self.fileProcessor {
+                    processor.processFiles(urls)
+                } else {
+                    // App may still be setting up SwiftUI; buffer URLs until ready.
+                    self.pendingServiceURLs.append(contentsOf: urls)
+                }
             }
         }
     }
@@ -88,52 +96,45 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // Uses multiple activation strategies to ensure the app is visible when invoked
     // from Finder services, which may launch the app in the background.
     private func bringAppToForeground() {
-        // Strategy 1: Set activation policy to regular to ensure app can come to foreground
+        // Strategy 1: Unhide the app FIRST, before any other operations
+        // This must happen synchronously and immediately for macOS Tahoe
+        if NSApp.isHidden {
+            NSApp.unhide(nil)
+        }
+        
+        // Strategy 2: Set activation policy to regular to ensure app can come to foreground
         NSApp.setActivationPolicy(.regular)
         
-        // Strategy 2: Use NSRunningApplication for more forceful activation
+        // Strategy 3: Use NSRunningApplication for more forceful activation
         NSRunningApplication.current.activate(options: [.activateAllWindows, .activateIgnoringOtherApps])
 
-        // Strategy 3: Activate the NSApplication itself
+        // Strategy 4: Activate the NSApplication itself
         NSApp.activate(ignoringOtherApps: true)
         
-        // Strategy 4: Immediately unhide and show window before delayed activation
-        // This is critical for macOS Tahoe where the window may be hidden by default
-        if let window = NSApp.windows.first {
-            // Unhide the application if it's hidden
-            if NSApp.isHidden {
-                NSApp.unhide(nil)
-            }
-            
+        // Strategy 5: Immediately show all windows with maximum visibility settings
+        // This is critical for macOS Tahoe where windows may be hidden by default
+        for window in NSApp.windows {
             // If window is miniaturized, deminiaturize it
             if window.isMiniaturized {
                 window.deminiaturize(nil)
             }
             
+            // Set to floating level immediately for maximum visibility
+            window.level = .floating
+            
             // Use orderFrontRegardless which is more forceful than makeKeyAndOrderFront
             window.orderFrontRegardless()
+            
+            // Make it key and main
+            window.makeKeyAndOrderFront(nil)
         }
         
-        // Strategy 5: Elevate window level after a slight delay
-        // The immediate ordering (Strategy 4) ensures visibility, while this delayed
-        // strategy keeps the window above others briefly to prevent it being hidden again
-        DispatchQueue.main.asyncAfter(deadline: .now() + activationDelay) { [weak self] in
-            guard let self = self else { return }
-            let resetDelay = self.windowLevelResetDelay
-            
-            if let window = NSApp.windows.first {
-                // Set window level to ensure visibility
-                window.level = .floating
-                window.makeKeyAndOrderFront(nil)
-                
-                // Reset window level after a brief moment.
-                // Using weak capture to prevent retain cycles and checking window validity
-                // to handle the edge case where window is closed during the delay.
-                DispatchQueue.main.asyncAfter(deadline: .now() + resetDelay) { [weak window] in
-                    // Verify window still exists and is in the window list before resetting level
-                    if let window = window, NSApp.windows.contains(window) {
-                        window.level = .normal
-                    }
+        // Strategy 6: Reset window level after ensuring visibility
+        // The immediate floating level ensures the window appears, this resets it to normal
+        DispatchQueue.main.asyncAfter(deadline: .now() + windowLevelResetDelay) {
+            for window in NSApp.windows {
+                if NSApp.windows.contains(window) {
+                    window.level = .normal
                 }
             }
         }
