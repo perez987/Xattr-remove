@@ -74,9 +74,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // If launched from Finder service before applicationDidFinishLaunching,
         // ensure window is visible
         if launchedFromService {
-            logger.info("Service launch detected, ensuring window visibility")
+            self.logger.info("Service launch detected, ensuring window visibility")
             // Wait for SwiftUI to finish creating the window on Tahoe before activation.
-            DispatchQueue.main.asyncAfter(deadline: .now() + windowInitializationDelay) {
+            let logger = self.logger
+            DispatchQueue.main.asyncAfter(deadline: .now() + windowInitializationDelay) { [weak self] in
+                guard let self = self else {
+                    logger.warning("App delegate released before service window activation")
+                    return
+                }
                 self.bringAppToForeground()
             }
         }
