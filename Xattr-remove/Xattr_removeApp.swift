@@ -144,7 +144,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.activate(ignoringOtherApps: true)
         
         // Strategy 4: Re-show all windows to maintain visibility
-        // Note: This is called after initial showAllWindows() to reinforce window visibility
+        // Note: This is a lightweight reinforcement (just makeKeyAndOrderFront)
+        // We don't call showAllWindows() here because it would:
+        // 1. Set window level to floating again (already done in initial showAllWindows)
+        // 2. Schedule another window level reset, potentially conflicting with the first one
         for window in NSApp.windows {
             window.makeKeyAndOrderFront(nil)
         }
