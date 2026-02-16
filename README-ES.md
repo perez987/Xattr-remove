@@ -6,7 +6,7 @@
 
 Aplicación para macOS desarrollada con SwiftUI que elimina el atributo extendido `com.apple.quarantine` de los archivos descargados de internet. Funciona aceptando archivos mediante la función de arrastrar y soltar en la ventana de la aplicación.
 
-Esta aplicación es una versión más sencilla y ligera de [Xattr Editor](https://github.com/perez987/Xattr-Editor). En lugar de mostrar y editar (eliminar, modificar y añadir) atributos extendidos, realiza una única tarea: eliminar `com.apple.quarantine` rápidamente de los archivos descargados de internet para que puedan abrirse en macOS Tahoe (las versiones anteriores de macOS tienen un sistema de advertencia más flexible y se abren con mayor facilidad).
+Esta aplicación es una versión más sencilla y ligera de [Xattr Editor](https://github.com/perez987/Xattr-Editor). En lugar de mostrar y editar (eliminar, modificar y añadir) atributos extendidos, realiza una única tarea: eliminar `com.apple.quarantine` rápidamente de los archivos descargados de internet para que puedan abrirse en macOS sin advertencias de Gatekeeper.
 
 | Capturas de pantalla |
 |:----|
@@ -24,15 +24,6 @@ Esta aplicación es una versión más sencilla y ligera de [Xattr Editor](https:
 - Admite todo tipo de archivos, incluyendo aplicaciones y ejecutables
 - Sistema de traducción con selector y 5 idiomas (alemán, inglés, francés, italiano y español)
 - Elegir idioma: ir a `Idioma` > `Elegir idioma` en la barra de menús o usar el atajo de teclado `⌘ + L` 
-
-## Servicio del Finder
-
-- Se ha añadido un servicio del Finder para que los usuarios puedan eliminar `com.apple.quarantine` directamente desde el menú del botón derecho sin tener que abrir la app y arrastrar archivos sobre la ventana
-- **Importante:** El servicio del Finder solo está disponible en **macOS Sonoma (14.x) y versiones anteriores**. En macOS Sequoia (15.x) y Tahoe (16.x), el servicio está deshabilitado debido a problemas persistentes de visibilidad de ventanas. Los usuarios de estas versiones más recientes deben usar la funcionalidad de arrastrar y soltar en su lugar.
-- macOS puede requerir cerrar y volver a iniciar sesión o ejecutar en Terminal  `/System/Library/CoreServices/pbs -update` para que el servicio aparezca en el Finder
-- Para más información, lee el documento [Update-Xcode-service](DOCS/Update-Xcode-service.md).
-
-![title](Images/Finder-service-es.png)
 
 ## Compilación
 

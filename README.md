@@ -6,7 +6,7 @@
 
 SwiftUI application for macOS that removes `com.apple.quarantine` extended attribute from files downloaded from the Internet. Works by accepting files via drag and drop onto the app window.
 
-This app is a simpler and lighter version of [Xattr Editor](https://github.com/perez987/Xattr-Editor). Instead of displaying and editing (removing, modifying, adding) extended attributes, it performs a single task: removing `com.apple.quarantine` in a quick way from files downloaded from the Internet so that they can be opened in macOS Tahoe (earlier macOS versions have a more relaxed warning system and can be opened more easily).
+This app is a simpler and lighter version of [Xattr Editor](https://github.com/perez987/Xattr-Editor). Instead of displaying and editing (removing, modifying, adding) extended attributes, it performs a single task: removing `com.apple.quarantine` in a quick way from files downloaded from the Internet so that they can be opened in macOS without Gatekeeper warnings.
 
 | Screenshots |
 |:----|
@@ -24,15 +24,6 @@ This app is a simpler and lighter version of [Xattr Editor](https://github.com/p
 - Supports all file types including apps and executables
 - Localization system with language selector and 5 languages (German, English, French, Italian and Spanish)
 - Language selector: `Language` > `Select language` in menubar or `⌘ + L` keyboard shortcut 
-
-## Finder service
-
-- Adds a macOS Finder service so users can clear com.apple.quarantine directly from the right-click Services menu without drag-and-drop
-- **Important:** The Finder service is only available on **macOS Sonoma (14.x) and earlier**. On macOS Sequoia (15.x) and Tahoe (16.x), the service is disabled due to persistent window visibility issues. Users on these newer versions should use the drag-and-drop functionality instead.
-- macOS may require logout/login or run in Terminal `/System/Library/CoreServices/pbs -update` for the service to appear in the Finder
-- For more information, read the document [Update-Xcode-service](DOCS/Update-Xcode-service.md).
-
-![title](Images/Finder-service.png)
 
 ## Building
 
