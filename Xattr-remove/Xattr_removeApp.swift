@@ -203,6 +203,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         logger.info("Showing \(NSApp.windows.count) window(s)")
         
+        // First, ensure the app itself is fully visible
+        NSApp.unhide(nil)
+        NSApp.activateIgnoringOtherApps(true)
+        
         // Iterate all windows and make them visible with maximum visibility settings
         for window in NSApp.windows {
             // If window is miniaturized, deminiaturize it
@@ -210,14 +214,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 window.deminiaturize(nil)
             }
             
+            // Make window visible if it's not
+            if !window.isVisible {
+                logger.info("Window was not visible, making it visible")
+            }
+            
             // Set to floating level immediately for maximum visibility
             window.level = .floating
+            
+            // Make window opaque and remove any alpha
+            window.isOpaque = true
+            window.alphaValue = 1.0
             
             // Use orderFrontRegardless which is more forceful than makeKeyAndOrderFront
             window.orderFrontRegardless()
             
             // Make it key and main
             window.makeKeyAndOrderFront(nil)
+            
+            // Center the window on screen for better visibility
+            window.center()
         }
         
         // Reset window level after ensuring visibility
