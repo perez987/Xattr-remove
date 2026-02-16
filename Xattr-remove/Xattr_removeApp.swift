@@ -16,8 +16,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private let activationDelay: TimeInterval = 0.1
     // windowLevelResetDelay: Keep window elevated briefly to ensure visibility, then restore normal level
     private let windowLevelResetDelay: TimeInterval = 0.2
-    // windowInitializationDelay: Wait for SwiftUI window to be created when launched from service
-    private let windowInitializationDelay: TimeInterval = 0.05
+    // windowInitializationDelay: Wait for SwiftUI window to be created after activation from service
+    // Increased to 0.2s on macOS Tahoe to allow WindowGroup sufficient time to create window
+    private let windowInitializationDelay: TimeInterval = 0.2
+    // windowCreationRetryDelay: Wait before retrying if windows don't exist
+    private let windowCreationRetryDelay: TimeInterval = 0.1
+    // Maximum attempts to find/create windows before giving up
+    private let maxWindowCreationRetries = 3
 
     // Reference to the FileProcessor, set by the SwiftUI App when the view appears.
     // Allows the Finder service handler to reuse existing processing and alert logic.
@@ -27,6 +32,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     // URLs received from a Finder service invocation before SwiftUI finished setup.
     private var pendingServiceURLs: [URL] = []
+    
+    // Track retry attempts for window creation
+    private var windowCreationRetryCount = 0
 
     func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {
         // Return true to explicitly opt-in to secure coding, suppressing the warning.
@@ -83,7 +91,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             
             // Longer delay to allow SwiftUI window to fully initialize after activation
             // This is critical for macOS Tahoe when launched from Finder service
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + self.windowInitializationDelay) {
                 // Bring the app window to the foreground when invoked from the Finder service
                 self.bringAppToForeground()
 
@@ -109,6 +117,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // Uses multiple activation strategies to ensure the app is visible when invoked
     // from Finder services, which may launch the app in the background.
     private func bringAppToForeground() {
+        // Reset retry counter for new activation attempt
+        windowCreationRetryCount = 0
+        
         // Strategy 1: Unhide the app FIRST, before any other operations
         // This must happen synchronously and immediately for macOS Tahoe
         if NSApp.isHidden {
@@ -129,12 +140,30 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if NSApp.windows.isEmpty {
             logger.warning("No windows exist after activation, waiting for window creation")
             
-            // Wait a bit more and try again recursively
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-                self?.showAllWindows()
+            // Wait a bit more and try again with retry limit
+            DispatchQueue.main.asyncAfter(deadline: .now() + windowCreationRetryDelay) { [weak self] in
+                self?.showAllWindowsWithRetry()
             }
         } else {
             // Windows exist, show them immediately
+            showAllWindows()
+        }
+    }
+    
+    // Helper method to retry showing windows with a maximum attempt limit
+    private func showAllWindowsWithRetry() {
+        windowCreationRetryCount += 1
+        
+        if NSApp.windows.isEmpty {
+            if windowCreationRetryCount < maxWindowCreationRetries {
+                logger.warning("Retry \(windowCreationRetryCount)/\(maxWindowCreationRetries): No windows exist, waiting...")
+                DispatchQueue.main.asyncAfter(deadline: .now() + windowCreationRetryDelay) { [weak self] in
+                    self?.showAllWindowsWithRetry()
+                }
+            } else {
+                logger.error("Failed to create windows after \(maxWindowCreationRetries) retries")
+            }
+        } else {
             showAllWindows()
         }
     }
