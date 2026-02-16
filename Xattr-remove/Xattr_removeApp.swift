@@ -96,7 +96,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         guard isFinderServiceSupported else {
             logger.error("Finder service invoked on unsupported macOS version \(ProcessInfo.processInfo.operatingSystemVersion.majorVersion)")
             error.pointee = "Service not available on this macOS version" as NSString
-            // CRITICAL: On macOS 15+ (Sequoia/Tahoe), the service is disabled due to window visibility issues.
+            // CRITICAL: On macOS 15+ (Sequoia and later), the service is disabled due to window visibility issues.
             // When invoked via the context menu, macOS launches the app, but we must immediately quit
             // to prevent SwiftUI from creating and showing windows. Schedule termination on the main
             // queue to ensure this method completes first (returning the error).
