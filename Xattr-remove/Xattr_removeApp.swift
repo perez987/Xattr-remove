@@ -114,7 +114,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             window.orderFrontRegardless()
         }
         
-        // Strategy 5: Bring window to front with a slight delay to ensure activation completes
+        // Strategy 5: Elevate window level after a slight delay
+        // The immediate ordering (Strategy 4) ensures visibility, while this delayed
+        // strategy keeps the window above others briefly to prevent it being hidden again
         DispatchQueue.main.asyncAfter(deadline: .now() + activationDelay) { [weak self] in
             guard let self = self else { return }
             let resetDelay = self.windowLevelResetDelay
