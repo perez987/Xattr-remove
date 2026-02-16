@@ -152,18 +152,40 @@ Files are processed in parallel using `DispatchQueue.global(qos: .userInitiated)
 ### Potential Features (Not Implemented)
 
 1. **Configurable quit delay**: Allow users to set delay in preferences
-2. **Finder service**: Right-click context menu integration
-3. **Progress indicator**: For large batches of files
-4. **Sound feedback**: Audio confirmation on completion
-5. **Detailed logging**: Export processing history to file
+2. **Progress indicator**: For large batches of files
+3. **Sound feedback**: Audio confirmation on completion
+4. **Detailed logging**: Export processing history to file
 
-### Why These Aren't Included
+## Window Visibility Fix for Sequoia/Tahoe
 
-Per requirements:
+### Issue
+When the app is launched from a Finder service on macOS Sequoia and Tahoe, the window doesn't appear. Clicking the Dock icon makes it appear immediately. Works fine on Sonoma.
 
-- Finder service not required for now
-- Focus on simple, focused functionality
-- Minimal UI changes requested
+### Root Cause
+Previous implementation tried to enforce window visibility with delays and retry logic BEFORE SwiftUI's WindowGroup created the window. The timing was unreliable because:
+- SwiftUI creates windows asynchronously
+- Service handler runs before window creation completes
+- Delays/retries couldn't reliably detect when the window existed
+
+### Solution (Implemented)
+Window visibility is now enforced AFTER we KNOW the window exists - in ContentView.onAppear:
+
+1. Service handler activates the app to trigger window creation
+2. Queues files for processing  
+3. SwiftUI creates the window
+4. ContentView.onAppear calls ensureWindowVisibilityAfterCreation()
+5. Window visibility is enforced using orderFrontRegardless() and floating level
+
+**Benefits:**
+- No delays or retries needed
+- Simpler code (removed 113 lines of complex timing logic)
+- More reliable - uses SwiftUI's lifecycle instead of guessing
+- Only enforces visibility when launched from service
+
+**Key Methods:**
+- `ensureWindowVisibilityAfterCreation()`: Called from ContentView.onAppear
+- `bringAppToForeground()`: Activates app and shows windows
+- `showAllWindows()`: Applies aggressive visibility settings
 
 ## Conclusion
 
@@ -172,6 +194,7 @@ The implementation successfully addresses all requirements:
 - Differentiated alert messages
 - 3-second auto-quit on success
 - Error handling maintained
+- Finder service integration with reliable window visibility on Sequoia/Tahoe
 - Documentation updated
 - Thread-safe implementation
 - Clean, maintainable code
