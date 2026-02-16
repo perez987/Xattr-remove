@@ -14,7 +14,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // Timing constants for window visibility
     // windowLevelResetDelay: Keep window elevated briefly to ensure visibility, then restore normal level
     private let windowLevelResetDelay: TimeInterval = 0.2
-    // windowInitializationDelay: Wait after onAppear for window to be fully ready on Sequoia/Tahoe
+    // windowInitializationDelay: Brief delay after showing windows to ensure focus is maintained
     private let windowInitializationDelay: TimeInterval = 0.05
 
     // Reference to the FileProcessor, set by the SwiftUI App when the view appears.
@@ -140,8 +140,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     // Called from ContentView.onAppear to ensure window is visible when launched from service.
-    // This is the key fix for Sequoia/Tahoe: enforce window visibility AFTER SwiftUI creates
-    // the window, not before. The window exists at this point, we just need to bring it front.
+    // This is the key fix for older macOS versions where window visibility can be enforced:
+    // enforce visibility AFTER SwiftUI creates the window, not before. The window exists at 
+    // this point, we just need to bring it front.
+    // Note: On macOS Sequoia (15.0+), the Finder service is disabled entirely, so this code
+    // primarily benefits macOS Sonoma (14.x) and earlier.
     func ensureWindowVisibilityAfterCreation() {
         // Only enforce visibility once, and only if launched from service
         guard launchedFromService, !windowVisibilityEnforced else { return }
@@ -149,9 +152,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         logger.info("ContentView appeared, enforcing window visibility for service launch")
         
-        // CRITICAL FIX for Sequoia/Tahoe: Show windows IMMEDIATELY, without delay
+        // CRITICAL FIX: Show windows IMMEDIATELY, without delay
         // The delay was causing the app to lose activation before windows could be shown
-        // On Sequoia/Tahoe, we must show windows synchronously in the same run loop as onAppear
+        // For service launches, we must show windows synchronously in the same run loop as onAppear
         showAllWindows()
         
         // Then do a secondary activation after a brief delay to ensure focus is maintained
@@ -227,12 +230,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             window.makeKey()
         }
         
-        // Reset window level after ensuring visibility
+        // Reset window level and collection behavior after ensuring visibility.
+        // This delayed reset restores normal window management behavior after the
+        // temporary floating level has served its purpose of forcing visibility.
         let windowsToReset = NSApp.windows
         DispatchQueue.main.asyncAfter(deadline: .now() + windowLevelResetDelay) {
             for window in windowsToReset where NSApp.windows.contains(window) {
                 window.level = .normal
-                // Reset collection behavior to default
+                // Reset collection behavior to default to restore standard window management
                 window.collectionBehavior = .default
             }
         }
