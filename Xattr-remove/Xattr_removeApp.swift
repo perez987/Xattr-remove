@@ -75,7 +75,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // ensure window is visible
         if launchedFromService {
             logger.info("Service launch detected, ensuring window visibility")
-            bringAppToForeground()
+            DispatchQueue.main.asyncAfter(deadline: .now() + windowInitializationDelay) { [weak self] in
+                self?.bringAppToForeground()
+            }
         }
     }
     // Finder Service Handler
