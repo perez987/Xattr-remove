@@ -87,9 +87,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             
             // Strategy 1: Unhide the app FIRST, before any activation
             // This is critical for macOS Tahoe - apps launched from services start hidden
-            if NSApp.isHidden {
-                NSApp.unhide(nil)
-            }
+            NSApp.unhide(nil)
             
             // Strategy 2: Force activation immediately to trigger SwiftUI window creation
             NSApp.setActivationPolicy(.regular)
@@ -129,9 +127,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         // Strategy 1: Unhide the app FIRST, before any other operations
         // This must happen synchronously and immediately for macOS Tahoe
-        if NSApp.isHidden {
-            NSApp.unhide(nil)
-        }
+        NSApp.unhide(nil)
         
         // Strategy 2: Set activation policy to regular to ensure app can come to foreground
         NSApp.setActivationPolicy(.regular)
