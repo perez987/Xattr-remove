@@ -32,27 +32,5 @@
 	<false/>
 	<key>NSApplicationSupportsSecureRestorableState</key>
 	<true/>
-	<key>NSServices</key>
-	<array>
-		<dict>
-			<key>NSMenuItem</key>
-			<dict>
-				<key>default</key>
-				<string>⎋ com.apple.quarantine</string>
-			</dict>
-			<key>NSMessage</key>
-			<string>removeQuarantine</string>
-			<key>NSPortName</key>
-			<string>Xattr-remove</string>
-			<key>NSRequiredContext</key>
-			<dict/>
-			<key>NSReturnTypes</key>
-			<array/>
-			<key>NSSendTypes</key>
-			<array>
-				<string>NSFilenamesPboardType</string>
-			</array>
-		</dict>
-	</array>
 </dict>
 </plist>
