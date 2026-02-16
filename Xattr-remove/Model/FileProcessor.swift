@@ -24,7 +24,7 @@ class FileProcessor: ObservableObject {
     private let logger = Logger(subsystem: "com.xattr-rm.app", category: "FileProcessor")
 
     // Delay for displaying success alert before auto-quit
-    private let alertDisplayDuration: TimeInterval = 4.0
+    private let alertDisplayDuration: TimeInterval = 3.0
     // Delay after dismissing alert before terminating app (needed for macOS Sonoma compatibility)
     private let alertDismissalDelay: TimeInterval = 0.2
 

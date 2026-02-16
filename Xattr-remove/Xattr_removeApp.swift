@@ -241,7 +241,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             window.makeKeyAndOrderFront(nil)
             
             // Center the window on screen for better visibility
-            window.center()
+//            window.center()
         }
         
         // Reset window level after ensuring visibility
