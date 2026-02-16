@@ -76,8 +76,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if launchedFromService {
             logger.info("Service launch detected, ensuring window visibility")
             // Wait for SwiftUI to finish creating the window on Tahoe before activation.
-            DispatchQueue.main.asyncAfter(deadline: .now() + windowInitializationDelay) { [weak self] in
-                self?.bringAppToForeground()
+            DispatchQueue.main.asyncAfter(deadline: .now() + windowInitializationDelay) {
+                self.bringAppToForeground()
             }
         }
     }
