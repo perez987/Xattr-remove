@@ -1,0 +1,38 @@
+/* 
+  Localizable.strings
+  Xattr-remove
+  English localization
+*/
+
+/* UI Strings */
+"drop_file_here" = "Drop file here";
+"remove_quarantine_subtitle" = "to remove com.apple.quarantine";
+"ok_button" = "OK";
+
+/* Alert Titles */
+"error_title" = "Error";
+"success_title" = "Success";
+
+/* Error Messages */
+"error_single_file" = "Failed to remove quarantine attribute. The file may be in a protected location or require administrator privileges.";
+"error_multiple_files" = "Failed to remove quarantine attribute from %d file(s). Some files may be in protected locations or require administrator privileges.";
+
+/* Success Messages */
+"success_removed_single" = "Successfully removed quarantine attribute from file.";
+"success_removed_multiple" = "Successfully removed quarantine attribute from %d files.";
+"success_not_present_single" = "Successfully processed 1 file (quarantine attribute was not present).";
+"success_not_present_multiple" = "Successfully processed %d files (quarantine attribute was not present).";
+"success_mixed" = "Successfully processed %d files (com.apple.quarantine was present in %d and absent in %d).";
+
+/* Language Menu */
+"menu_language" = "Language";
+"menu_select_language" = "Select Language...";
+"language_selector_title" = "Select Language";
+"accept" = "Accept";
+"cancel" = "Cancel";
+"ok" = "OK";
+"language_changed_title" = "Language Changed";
+"language_changed_message" = "Please restart the application\nto apply the new language.";
+
+/* Finder Service */
+"finder_service_label" = "Clear Quarantine Attribute";

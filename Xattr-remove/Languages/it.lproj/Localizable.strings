@@ -1,0 +1,38 @@
+/* 
+  Localizable.strings
+  Xattr-remove
+  Italian localization
+*/
+
+/* UI Strings */
+"drop_file_here" = "Rilascia il file qui";
+"remove_quarantine_subtitle" = "per rimuovere com.apple.quarantine";
+"ok_button" = "OK";
+
+/* Alert Titles */
+"error_title" = "Errore";
+"success_title" = "Successo";
+
+/* Error Messages */
+"error_single_file" = "Impossibile rimuovere com.apple.quarantine. Il file potrebbe trovarsi in una posizione protetta o richiedere privilegi di amministratore.";
+"error_multiple_files" = "Impossibile rimuovere com.apple.quarantine da %d file. Alcuni file potrebbero trovarsi in posizioni protette o richiedere privilegi di amministratore.";
+
+/* Success Messages */
+"success_removed_single" = "com.apple.quarantine rimosso con successo dal file.";
+"success_removed_multiple" = "com.apple.quarantine rimosso con successo da %d file.";
+"success_not_present_single" = "1 file elaborato con successo (com.apple.quarantine non era presente).";
+"success_not_present_multiple" = "%d file elaborati con successo (com.apple.quarantine non era presente).";
+"success_mixed" = "%d file elaborati con successo (com.apple.quarantine era presente in %d e assente in %d).";
+
+/* Language Menu */
+"menu_language" = "Lingua";
+"menu_select_language" = "Seleziona lingua";
+"language_selector_title" = "Seleziona lingua";
+"accept" = "Accetta";
+"cancel" = "Annulla";
+"ok" = "Accettare";
+"language_changed_title" = "Lingua modificata";
+"language_changed_message" = "Riavvia l'applicazione\nper applicare la nuova lingua.";
+
+/* Finder Service */
+"finder_service_label" = "Rimuovi attributo di quarantena";

@@ -1,0 +1,38 @@
+/* 
+  Localizable.strings
+  Xattr-remove
+  German localization
+*/
+
+/* UI Strings */
+"drop_file_here" = "Datei hier ablegen";
+"remove_quarantine_subtitle" = "com.apple.quarantine entfernen";
+"ok_button" = "OK";
+
+/* Alert Titles */
+"error_title" = "Fehler";
+"success_title" = "Erfolg";
+
+/* Error Messages */
+"error_single_file" = "Das Quarantäne-Attribut konnte nicht entfernt werden. Die Datei befindet sich möglicherweise an einem geschützten Ort oder erfordert Administratorrechte.";
+"error_multiple_files" = "Das Quarantäne-Attribut konnte nicht von %d Datei(en) entfernt werden. Einige Dateien befinden sich möglicherweise an geschützten Orten oder erfordern Administratorrechte.";
+
+/* Success Messages */
+"success_removed_single" = "Quarantäne-Attribut erfolgreich von der Datei entfernt.";
+"success_removed_multiple" = "Quarantäne-Attribut erfolgreich von %d Dateien entfernt.";
+"success_not_present_single" = "1 Datei erfolgreich verarbeitet (Quarantäne-Attribut war nicht vorhanden).";
+"success_not_present_multiple" = "%d Dateien erfolgreich verarbeitet (Quarantäne-Attribut war nicht vorhanden).";
+"success_mixed" = "%d Dateien erfolgreich verarbeitet (com.apple.quarantine war in %d vorhanden und in %d nicht vorhanden).";
+
+/* Language Menu */
+"menu_language" = "Sprache";
+"menu_select_language" = "Sprache auswählen...";
+"language_selector_title" = "Sprache auswählen";
+"accept" = "Akzeptieren";
+"cancel" = "Abbrechen";
+"ok" = "Akzeptieren";
+"language_changed_title" = "Sprache geändert";
+"language_changed_message" = "Bitte starten Sie die Anwendung neu,\num die neue Sprache anzuwenden.";
+
+/* Finder Service */
+"finder_service_label" = "Quarantäne-Attribut entfernen";

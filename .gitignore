@@ -1,0 +1,18 @@
+.DS_Store
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+Temporary Items
+Thumbs.db
+
+*.xcuserstate
+.build/
+
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
