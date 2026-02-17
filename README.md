@@ -35,7 +35,7 @@ Open `Xattr-remove.xcodeproj` in Xcode and build the project. The app requires m
 2. Drag and drop files that have the quarantine attribute onto the app window
 3. The quarantine attribute (if it exists) will be automatically removed
 4. The user gets an alert as feedback
-5. The app automatically quits 4 seconds after displaying a success alert
+5. The app automatically quits 3 seconds after displaying a success alert
 
 **Note:** Files must be dropped onto the app window. Dropping files onto the app icon in Finder or Dock is not supported due to macOS Gatekeeper restrictions with quarantined executables.
 
@@ -46,7 +46,16 @@ Open `Xattr-remove.xcodeproj` in Xcode and build the project. The app requires m
 
 ## First run
 
-The drawback of Xattr-remove is that, since it's also an app downloaded from the Internet, it also displays the Gatekeeper warning on the first run. This is unavoidable since the app is only ad-hoc signed and not notarized. This doesn't happen if you download the source code, compile the app using Xcode, and save the product for regular use.
+Xattr-remove, since it's also an app downloaded from the Internet, it also displays the Gatekeeper warning on the first run. This is unavoidable since the app is only ad-hoc signed and not notarized.
+</br>
+To remove the quarantine attribute from Xattr-remove.app:
+
+- open Terminal
+- write `sudo xattr -cr`
+- drag and drop Xattr-remove.app onto the Terminal window
+- ENTER.
+
+This doesn't happen if you download the source code, compile the app using Xcode, and save the product for regular use.
 
 ## Credits
 

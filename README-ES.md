@@ -35,7 +35,7 @@ Abre `Xattr-remove.xcodeproj` en Xcode y compila el proyecto. La aplicación req
 2. Arrastra y suelta los archivos con el atributo de cuarentena en la ventana de la aplicación
 3. El atributo de cuarentena (si existe) se elimina automáticamente
 4. El usuario recibe una alerta como información
-5. La aplicación se cierra automáticamente 4 segundos después de mostrar una alerta de confirmación
+5. La aplicación se cierra automáticamente 3 segundos después de mostrar una alerta de confirmación
 6. En caso de error, la aplicación se mantiene abierta sin cierre automático.
 
 **Nota:** Los archivos deben soltarse en la ventana de la aplicación. No se permite soltar archivos en el icono de la aplicación en el Finder o el Dock debido a las restricciones de Gatekeeper con los ejecutables con atributo de cuarentena.
@@ -47,7 +47,15 @@ Abre `Xattr-remove.xcodeproj` en Xcode y compila el proyecto. La aplicación req
 
 ## Primera ejecución
 
-La desventaja de Xattr-remove es que, al ser una aplicación descargada de internet, también muestra la advertencia de Gatekeeper en la primera ejecución. Esto es inevitable, ya que la aplicación solo está firmada ad hoc y no está notarizada. Esto no ocurre si se descarga el código fuente, se compila la aplicación con Xcode y se guarda el producto para su uso habitual.
+Xattr-remove, al ser una aplicación descargada de internet, también muestra la advertencia de Gatekeeper en la primera ejecución. Esto es inevitable, ya que la aplicación sólo está firmada ad hoc y no está notarizada.</br>
+Para quitar el atributo la primera vez que ejecutas la app:
+
+- abre Terminal
+- escribe `sudo xattr -cr`
+- arrastra Xattr-remove.app sobre la ventana de Terminal
+- ENTER.
+
+Esto no ocurre si descargas el código fuente, compilas la aplicación con Xcode y guardas el producto para uso habitual.
 
 ## Créditos
 
