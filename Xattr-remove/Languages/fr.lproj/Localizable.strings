@@ -36,3 +36,6 @@
 
 /* Finder Service */
 "finder_service_label" = "Supprimer l'attribut de quarantaine";
+
+/* Sparkle updater */
+"Check for Updates..." = "Vérifier les Mises à Jour...";

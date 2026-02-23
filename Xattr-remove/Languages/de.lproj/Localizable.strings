@@ -36,3 +36,7 @@
 
 /* Finder Service */
 "finder_service_label" = "Quarantäne-Attribut entfernen";
+
+/* Sparkle updater */
+"Check for Updates..." = "Auf Updates prüfen...";
+

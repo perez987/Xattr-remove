@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <channel>
+        <title>Xattr-remove</title>
+        <link>https://github.com/perez987/Xattr-remove</link>
+        <description>Most recent changes with links to updates</description>
+        <language>en</language>
+        <item>
+            <title>Version 1.5.0</title>
+            <description></description>
+            <pubDate>Fri, 01 Jan 2025 00:00:00 +0000</pubDate>
+            <enclosure
+                url="https://github.com/perez987/Xattr-remove/releases/download/v1.5.0/Xattr-remove.zip"
+                sparkle:version="31"
+                sparkle:shortVersionString="1.5.0"
+                length="1997006"
+                sparkle:edSignature="lAVWIb0P94uLSRelv8/izkDUKgAwumCdlRzLGVDfU++PwAF5HmWGR9Delx2Of7qneFZTC1aWVHJbFrfueONkDQ=="
+                type="application/octet-stream"
+            />
+            <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+        </item>
+    </channel>
+</rss>
