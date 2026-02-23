@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
     <channel>
         <title>Xattr-remove</title>
-        <link>https://github.com/perez987/Xattr-remove</link>
+        <link> https://github.com/perez987/Xattr-remove</link>
         <description>Most recent changes with links to updates</description>
         <language>en</language>
         <item>
