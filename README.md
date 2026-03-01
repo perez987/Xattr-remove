@@ -20,10 +20,12 @@ This app is a simpler and lighter version of [Xattr Editor](https://github.com/p
 
 - Drop files onto the app window to remove the quarantine attribute
 - Built with Swift and SwiftUI
-- Handles errors (whether the attribute exists or not)
+- Handle errors (whether the attribute exists or not)
 - Supports all file types including apps and executables
 - Localization system with language selector and 5 languages (German, English, French, Italian and Spanish)
 - Language selector: `Language` > `Select language` in menubar or `⌘ + L` keyboard shortcut 
+- Integrate Sparkle auto-updates (add Sparkle via SwiftPM)
+- Add a Check for Updates menu (`⌘ + U`)
 
 ## Building
 

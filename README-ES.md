@@ -23,7 +23,9 @@ Esta aplicación es una versión más sencilla y ligera de [Xattr Editor](https:
 - Gestiona errores (independientemente de si el atributo existe o no)
 - Admite todo tipo de archivos, incluyendo aplicaciones y ejecutables
 - Sistema de traducción con selector y 5 idiomas (alemán, inglés, francés, italiano y español)
-- Elegir idioma: ir a `Idioma` > `Elegir idioma` en la barra de menús o usar el atajo de teclado `⌘ + L` 
+- Elegir idioma: ir a `Idioma` > `Elegir idioma` en la barra de menús o usar el atajo de teclado `⌘ + L`
+- Se ha integrado el sistema de actualizaciones Sparkle
+- Se ha añadido el menú `Comprobar actualizaciones` con atajo de teclado (`⌘ + U`)
 
 ## Compilación
 
