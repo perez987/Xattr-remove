@@ -32,6 +32,8 @@
 	<false/>
 	<key>NSApplicationSupportsSecureRestorableState</key>
 	<true/>
+	<key>NSDocumentSavesInPlace</key>
+	<true/>
 	<key>SUFeedURL</key>
 	<string>https://raw.githubusercontent.com/perez987/Xattr-remove/main/appcast.xml</string>
 	<key>SUPublicEDKey</key>
