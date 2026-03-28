@@ -10,11 +10,11 @@ This app is a simpler and lighter version of [Xattr Editor](https://github.com/p
 
 | Screenshots |
 |:----|
-| ![title](Images/Main-window.png) |
-| ![title](Images/Quarantine-files.png) |
-| ![title](Images/Unquarantine-files.png) |
-| ![title](Images/Mixed-files.png) |
-| ![title](Images/Error.png) |
+| ![Main](Images/Main-window.png) |
+| ![Qurantine](Images/Quarantine-files.png) |
+| ![Unquarantine](Images/Unquarantine-files.png) |
+| ![Mixed](Images/Mixed-files.png) |
+| ![Error](Images/Error.png) |
 
 ## Features
 
