@@ -11,6 +11,7 @@ import os.log
 
 struct ContentView: View {
     @State private var isTargeted = false
+    @AppStorage("resign_after_processing") private var shouldResignAfterProcessing = false
     @EnvironmentObject var fileProcessor: FileProcessor
     
     // Logger for UI events
@@ -29,14 +30,26 @@ struct ContentView: View {
             Text(NSLocalizedString("remove_quarantine_subtitle", comment: "Subtitle text"))
                 .font(.body)
                 .foregroundColor(.secondary)
+            
+            Divider()
+
+            Toggle(
+                NSLocalizedString("resign_after_processing_option", comment: "Option to re-sign dropped app bundles"),
+                isOn: $shouldResignAfterProcessing
+            )
+            .padding(.leading, 20)
+            .foregroundColor(.secondary)
+            .multilineTextAlignment(.leading)
+            .toggleStyle(.checkbox)
+            .frame(maxWidth: 240,)
         }
         .frame(
-            minWidth: 320,
-            idealWidth: 320,
-            maxWidth: 320,
-            minHeight: 320,
-            idealHeight: 320,
-            maxHeight: 320
+            minWidth: 360,
+            idealWidth: 360,
+            maxWidth: 360,
+            minHeight: 340,
+            idealHeight: 340,
+            maxHeight: 340
         )
         .background(isTargeted ? Color.blue.opacity(0.1) : Color.clear)
         // Note: macOS may log reentrant drag IPC messages in Xcode console during drag operations.
@@ -79,7 +92,7 @@ struct ContentView: View {
         
         // Process all collected URLs after loading completes
         group.notify(queue: queue) {
-            self.fileProcessor.processFiles(urls)
+            self.fileProcessor.processFiles(urls, shouldResign: self.shouldResignAfterProcessing)
         }
     }
 }

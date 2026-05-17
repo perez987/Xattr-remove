@@ -7,6 +7,7 @@
 /* UI Strings */
 "drop_file_here" = "Drop file here";
 "remove_quarantine_subtitle" = "to remove com.apple.quarantine";
+"resign_after_processing_option" = "   Re-sign  app  and Sparkle";
 "ok_button" = "OK";
 
 /* Alert Titles */
@@ -16,6 +17,8 @@
 /* Error Messages */
 "error_single_file" = "Failed to remove quarantine attribute. The file may be in a protected location or require administrator privileges.";
 "error_multiple_files" = "Failed to remove quarantine attribute from %d file(s). Some files may be in protected locations or require administrator privileges.";
+"error_resign_failed_single" = "Quarantine was removed, but re-signing failed for 1 item.";
+"error_resign_failed_multiple" = "Quarantine was removed, but re-signing failed for %d item(s).";
 
 /* Success Messages */
 "success_removed_single" = "Successfully removed quarantine attribute from file.";
@@ -23,6 +26,9 @@
 "success_not_present_single" = "Successfully processed 1 file (quarantine attribute was not present).";
 "success_not_present_multiple" = "Successfully processed %d files (quarantine attribute was not present).";
 "success_mixed" = "Successfully processed %d files (com.apple.quarantine was present in %d and absent in %d).";
+"success_resigned_none" = "Successfully processed %d file(s). The dropped items contained no app bundles to re-sign.";
+"success_resigned_single" = "Successfully processed %d file(s) and re-signed 1 app bundle.";
+"success_resigned_multiple" = "Successfully processed %d file(s) and re-signed %d app bundles.";
 
 /* Language Menu */
 "menu_language" = "Language";

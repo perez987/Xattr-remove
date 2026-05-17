@@ -6,15 +6,15 @@
         <description>Most recent changes with links to updates</description>
         <language>en</language>
         <item>
-            <title>Version 1.5.0</title>
+            <title>Version 1.6.0</title>
             <description></description>
-            <pubDate>Fri, 01 Jan 2025 00:00:00 +0000</pubDate>
+            <pubDate>Sat, 14 Mar 2026 12:45:43 +0000</pubDate>
             <enclosure
-                url="https://github.com/perez987/Xattr-remove/releases/download/1.5.0/Xattr-remove.zip"
-                sparkle:version="31"
-                sparkle:shortVersionString="1.5.0"
-                length="1997005"
-                sparkle:edSignature="kLk9usAKbphZa7ngDGVPAgrEfj0TBflrYoYSm+jBCXX4CAfp7y13GijMKK1rWuFh3SRH2vIuvlzdJKg8uPrXBQ==="
+                url="https://github.com/perez987/Xattr-remove/releases/download/1.6.0/Xattr-remove-1.6.0.zip"
+                sparkle:version="35"
+                sparkle:shortVersionString="1.6.0"
+                length="1948254"
+                sparkle:edSignature="UOGuCVJgvbDSWCm1gR4ewGNe+QFFmaOFK2YQIxxb9ItduZAK0OZn6igYazD5teJ+yPsYXT0MUZM6uYPL6eZ5BA=="
                 type="application/octet-stream"
             />
             <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>

@@ -8,17 +8,18 @@ Aplicación para macOS desarrollada con SwiftUI que elimina el atributo extendid
 
 Esta aplicación es una versión más sencilla y ligera de [Xattr Editor](https://github.com/perez987/Xattr-Editor). En lugar de mostrar y editar (eliminar, modificar y añadir) atributos extendidos, realiza una única tarea: eliminar `com.apple.quarantine` rápidamente de los archivos descargados de internet para que puedan abrirse en macOS sin advertencias de Gatekeeper.
 
+Tamién puede, de manera opcional, auto firmar digitalmente *ad-hoc* una app (y el *framework* Sparkle) reemplazando su certificado. Esto es especialmente útil si al intentar ejecutar la app por primera vez, incluso si ya has quitado el atributo `com.apple.quarantine`, la app no arranca con un error relacionado con Sparkle.
+
 | Capturas de pantalla |
 |:----|
-| ![title](Images/Main-window-es.png) |
-| ![title](Images/Quarantine-files-es.png) |
-| ![title](Images/Unquarantine-files-es.png) |
-| ![title](Images/Mixed-files-es.png) |
-| ![title](Images/Error-es.png) |
+| ![Main](Images/Main-window-es.png) |
+| ![Qurantine](Images/7-files-1-app-es.png) |
+| ![Unquarantine](Images/6-files-no-app-es.png) |
 
 ## Características
 
 - Arrastra archivos a la ventana de la aplicación para eliminar el atributo de cuarentena
+- Casilla opcional para volver a firmar apps (primero Sparkle y después la app) tras el procesamiento del atributo `com.apple.quarantine`
 - Desarrollado con Swift y SwiftUI
 - Gestiona errores (independientemente de si el atributo existe o no)
 - Admite todo tipo de archivos, incluyendo aplicaciones y ejecutables
@@ -34,11 +35,12 @@ Abre `Xattr-remove.xcodeproj` en Xcode y compila el proyecto. La aplicación req
 ## Uso
 
 1. Abre la aplicación para ver la ventana principal
-2. Arrastra y suelta los archivos con el atributo de cuarentena en la ventana de la aplicación
+2. Arrastra y suelta los archivos descargados de Internet en la ventana de la aplicación
 3. El atributo de cuarentena (si existe) se elimina automáticamente
-4. El usuario recibe una alerta como información
-5. La aplicación se cierra automáticamente 3 segundos después de mostrar una alerta de confirmación
-6. En caso de error, la aplicación se mantiene abierta sin cierre automático.
+4. (Opcional) Activa la casilla de "Volver a firmar" antes de soltar archivos para ejecutar `codesign` ad-hoc en `Sparkle.framework` y después en la app
+5. El usuario recibe una alerta como información
+6. La aplicación se cierra automáticamente 3 segundos después de mostrar una alerta de confirmación
+7. En caso de error, la aplicación se mantiene abierta sin cierre automático.
 
 **Nota:** Los archivos deben soltarse en la ventana de la aplicación. No se permite soltar archivos en el icono de la aplicación en el Finder o el Dock debido a las restricciones de Gatekeeper con los ejecutables con atributo de cuarentena.
 
@@ -49,7 +51,7 @@ Abre `Xattr-remove.xcodeproj` en Xcode y compila el proyecto. La aplicación req
 
 ## Primera ejecución
 
-Xattr-remove, al ser una aplicación descargada de internet, también muestra la advertencia de Gatekeeper en la primera ejecución. Esto es inevitable, ya que la aplicación sólo está firmada ad hoc y no está notarizada.</br>
+Xattr-remove, al ser una aplicación descargada de internet, también muestra la advertencia de Gatekeeper en la primera ejecución. Esto es inevitable, ya que la aplicación sólo está firmada ad-hoc y no está notarizada.</br>
 Para quitar el atributo la primera vez que ejecutas la app:
 
 - abre Terminal

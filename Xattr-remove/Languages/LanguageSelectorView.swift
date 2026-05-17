@@ -29,9 +29,9 @@ struct LanguageSelectorView: View {
 
     // Available languages sorted by code
     private let languages: [LanguageItem] = [
-        LanguageItem(code: "de", name: "Deutsch", flag: "🇩🇪"),
         LanguageItem(code: "en", name: "English", flag: "🇬🇧"),
         LanguageItem(code: "es", name: "Español", flag: "🇪🇸"),
+        LanguageItem(code: "de", name: "Deutsch", flag: "🇩🇪"),
         LanguageItem(code: "fr", name: "Français", flag: "🇫🇷"),
         LanguageItem(code: "it", name: "Italiano", flag: "🇮🇹")
     ]

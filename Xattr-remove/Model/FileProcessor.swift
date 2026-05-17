@@ -29,7 +29,7 @@ class FileProcessor: ObservableObject {
     private let alertDismissalDelay: TimeInterval = 0.2
 
     // Process a list of file URLs
-    func processFiles(_ urls: [URL]) {
+    func processFiles(_ urls: [URL], shouldResign: Bool = false) {
         guard !urls.isEmpty else { return }
 
         logger.info("Processing \(urls.count) file(s)")
@@ -38,13 +38,27 @@ class FileProcessor: ObservableObject {
         let queue = DispatchQueue(label: "com.xattr-rm.file-processing")
         var removedCount = 0
         var notFoundCount = 0
-        var failedCount = 0
+        var xattrFailedCount = 0
+        var reSignSuccessCount = 0
+        var reSignFailedCount = 0
 
         for url in urls {
             group.enter()
             // Process file on background thread to avoid blocking UI
             DispatchQueue.global(qos: .userInitiated).async {
                 let result = XattrManager.removeQuarantineAttribute(from: url)
+                var reSignResult: ReSignResult?
+
+                if shouldResign {
+                    switch result {
+                    case .success, .notFound:
+                        if url.pathExtension.lowercased() == "app" {
+                            reSignResult = XattrManager.reSignAppBundle(at: url)
+                        }
+                    case .permissionDenied, .otherError:
+                        break
+                    }
+                }
 
                 queue.async {
                     switch result {
@@ -53,7 +67,16 @@ class FileProcessor: ObservableObject {
                     case .notFound:
                         notFoundCount += 1
                     case .permissionDenied, .otherError:
-                        failedCount += 1
+                        xattrFailedCount += 1
+                    }
+
+                    if let reSignResult {
+                        switch reSignResult {
+                        case .success:
+                            reSignSuccessCount += 1
+                        case .failure:
+                            reSignFailedCount += 1
+                        }
                     }
                     group.leave()
                 }
@@ -62,26 +85,38 @@ class FileProcessor: ObservableObject {
 
         // Show result alert after all files are processed
         group.notify(queue: queue) {
-            self.logger.info("Processing complete: \(removedCount) removed, \(notFoundCount) not found, \(failedCount) failed")
+            self.logger.info("Processing complete: \(removedCount) removed, \(notFoundCount) not found, \(xattrFailedCount) xattr failed, \(reSignSuccessCount) re-signed, \(reSignFailedCount) re-sign failed")
 
             // Capture the final counts before entering @MainActor context to avoid concurrency issues
             let finalRemovedCount = removedCount
             let finalNotFoundCount = notFoundCount
-            let finalFailedCount = failedCount
+            let finalXattrFailedCount = xattrFailedCount
+            let finalReSignSuccessCount = reSignSuccessCount
+            let finalReSignFailedCount = reSignFailedCount
+            let successfullyProcessedCount = finalRemovedCount + finalNotFoundCount
 
             // Build alert state locally then assign once to trigger a single objectWillChange
             DispatchQueue.main.asyncAfter(deadline: .now()) {
                 var newState = AlertState()
 
-                if finalFailedCount > 0 {
-                
+                if finalXattrFailedCount > 0 || finalReSignFailedCount > 0 {
                     newState.title = NSLocalizedString("error_title", comment: "Error alert title")
-                    if finalFailedCount == 1 && finalRemovedCount == 0 && finalNotFoundCount == 0 {
+
+                    if finalReSignFailedCount > 0 && finalXattrFailedCount == 0 {
+                        if finalReSignFailedCount == 1 {
+                            newState.message = NSLocalizedString("error_resign_failed_single", comment: "Error message for one re-sign failure")
+                        } else {
+                            newState.message = String.localizedStringWithFormat(
+                                NSLocalizedString("error_resign_failed_multiple", comment: "Error message for re-sign failures"),
+                                finalReSignFailedCount
+                            )
+                        }
+                    } else if finalXattrFailedCount == 1 && finalRemovedCount == 0 && finalNotFoundCount == 0 {
                         newState.message = NSLocalizedString("error_single_file", comment: "Error message for single file")
                     } else {
                         newState.message = String.localizedStringWithFormat(
                             NSLocalizedString("error_multiple_files", comment: "Error message for multiple files"),
-                            finalFailedCount
+                            finalXattrFailedCount
                         )
                     }
                     newState.isPresented = true
@@ -89,34 +124,54 @@ class FileProcessor: ObservableObject {
                 } else if finalRemovedCount > 0 || finalNotFoundCount > 0 {
                     newState.title = NSLocalizedString("success_title", comment: "Success alert title")
 
-                    // Build appropriate message based on counts
-                    if finalRemovedCount > 0 && finalNotFoundCount == 0 {
-                        // Only removed files
-                        if finalRemovedCount == 1 {
-                            newState.message = NSLocalizedString("success_removed_single", comment: "Success message for single removed file")
-                        } else {
+                    if shouldResign {
+                        if finalReSignSuccessCount == 0 {
                             newState.message = String.localizedStringWithFormat(
-                                NSLocalizedString("success_removed_multiple", comment: "Success message for multiple removed files"),
-                                finalRemovedCount
+                                NSLocalizedString("success_resigned_none", comment: "Success message when no app bundle needed re-signing"),
+                                successfullyProcessedCount
                             )
-                        }
-                    } else if finalRemovedCount == 0 && finalNotFoundCount > 0 {
-                        // Only not found files
-                        if finalNotFoundCount == 1 {
-                            newState.message = NSLocalizedString("success_not_present_single", comment: "Success message for single file without quarantine")
+                        } else if finalReSignSuccessCount == 1 {
+                            newState.message = String.localizedStringWithFormat(
+                                NSLocalizedString("success_resigned_single", comment: "Success message for one re-signed app"),
+                                successfullyProcessedCount
+                            )
                         } else {
                             newState.message = String.localizedStringWithFormat(
-                                NSLocalizedString("success_not_present_multiple", comment: "Success message for multiple files without quarantine"),
-                                finalNotFoundCount
+                                NSLocalizedString("success_resigned_multiple", comment: "Success message for multiple re-signed apps"),
+                                successfullyProcessedCount,
+                                finalReSignSuccessCount
                             )
                         }
                     } else {
-                        // Mixed results
-                        let total = finalRemovedCount + finalNotFoundCount
-                        newState.message = String.localizedStringWithFormat(
-                            NSLocalizedString("success_mixed", comment: "Success message for mixed results"),
-                            total, finalRemovedCount, finalNotFoundCount
-                        )
+                        // Build appropriate message based on counts
+                        if finalRemovedCount > 0 && finalNotFoundCount == 0 {
+                            // Only removed files
+                            if finalRemovedCount == 1 {
+                                newState.message = NSLocalizedString("success_removed_single", comment: "Success message for single removed file")
+                            } else {
+                                newState.message = String.localizedStringWithFormat(
+                                    NSLocalizedString("success_removed_multiple", comment: "Success message for multiple removed files"),
+                                    finalRemovedCount
+                                )
+                            }
+                        } else if finalRemovedCount == 0 && finalNotFoundCount > 0 {
+                            // Only not found files
+                            if finalNotFoundCount == 1 {
+                                newState.message = NSLocalizedString("success_not_present_single", comment: "Success message for single file without quarantine")
+                            } else {
+                                newState.message = String.localizedStringWithFormat(
+                                    NSLocalizedString("success_not_present_multiple", comment: "Success message for multiple files without quarantine"),
+                                    finalNotFoundCount
+                                )
+                            }
+                        } else {
+                            // Mixed results
+                            let total = finalRemovedCount + finalNotFoundCount
+                            newState.message = String.localizedStringWithFormat(
+                                NSLocalizedString("success_mixed", comment: "Success message for mixed results"),
+                                total, finalRemovedCount, finalNotFoundCount
+                            )
+                        }
                     }
 
                     newState.isPresented = true
@@ -136,4 +191,3 @@ class FileProcessor: ObservableObject {
         }
     }
 }
-
