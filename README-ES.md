@@ -8,7 +8,15 @@ Aplicación para macOS desarrollada con SwiftUI que elimina el atributo extendid
 
 Esta aplicación es una versión más sencilla y ligera de [Xattr Editor](https://github.com/perez987/Xattr-Editor). En lugar de mostrar y editar (eliminar, modificar y añadir) atributos extendidos, realiza una única tarea: eliminar `com.apple.quarantine` rápidamente de los archivos descargados de internet para que puedan abrirse en macOS sin advertencias de Gatekeeper.
 
-Tamién puede, de manera opcional, auto firmar digitalmente *ad-hoc* una app (y el *framework* Sparkle) reemplazando su certificado. Esto es especialmente útil si al intentar ejecutar la app por primera vez, incluso si ya has quitado el atributo `com.apple.quarantine`, la app no arranca con un error relacionado con Sparkle.
+Tamién puede, de manera opcional, auto firmar digitalmente *ad-hoc* una app (y el *framework* Sparkle) reemplazando su certificado. Esto es especialmente útil si al intentar ejecutar la app por primera vez, incluso si ya has quitado el atributo `com.apple.quarantine`, la app no arranca con un error relacionado con Sparkle. Esta opción equivale a ejecutar estos comandos:
+
+```bash
+ codesign --force --deep --sign - \
+  <App-name>.app/Contents/Frameworks/Sparkle.framework
+
+ codesign --force --deep --sign - \
+  <App-name>.app
+```
 
 | Capturas de pantalla |
 |:----|

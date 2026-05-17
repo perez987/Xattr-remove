@@ -8,7 +8,15 @@ SwiftUI application for macOS that removes `com.apple.quarantine` extended attri
 
 This app is a simpler and lighter version of [Xattr Editor](https://github.com/perez987/Xattr-Editor). Instead of displaying and editing (removing, modifying, adding) extended attributes, it performs a single task: removing `com.apple.quarantine` in a quick way from files downloaded from the Internet so that they can be opened in macOS without Gatekeeper warnings.
 
-You can also optionally digitally self-sign *ad-hoc* an app (and the Sparkle framework) by replacing its certificate. This is especially useful if, trying to run the app for the first time, even after removing the `com.apple.quarantine` attribute, the app crashes with a Sparkle-related error.
+You can also optionally digitally self-sign *ad-hoc* an app (and the Sparkle framework) by replacing its certificate. This is especially useful if, trying to run the app for the first time, even after removing the `com.apple.quarantine` attribute, the app crashes with a Sparkle-related error. This option is equivalent to running these commands:
+
+```bash
+ codesign --force --deep --sign - \
+  <App-name>.app/Contents/Frameworks/Sparkle.framework
+
+ codesign --force --deep --sign - \
+  <App-name>.app
+```
 
 | Screenshots |
 |:----|
