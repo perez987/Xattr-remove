@@ -7,8 +7,6 @@
 - **Language:** Swift 5 / SwiftUI
 - **Minimum macOS:** 13.0 (Ventura)
 - **Build tool:** Xcode (no command-line, only build path)
-- **Dependency manager:** Swift Package Manager (SPM), pinned via `Package.resolved`
-- **Single third-party dependency:** [Sparkle 2.9.0](https://github.com/sparkle-project/Sparkle) for auto-updates
 
 ## Repository Layout
 
@@ -123,7 +121,7 @@ Language selection is persisted in `UserDefaults` (`AppleLanguages` key). A rest
 
 ## Sparkle (Auto-Updates)
 
-- Integrated via SPM (`Sparkle 2.9.0`)
+- Integrated via integrated framework (`Sparkle 2.9.2`)
 - `UpdateController.swift` wraps `SPUStandardUpdaterController`
 - Menu item: **⌘U** ("Check for Updates…") — enabled only when `canCheckForUpdates` is `true`
 - Update feed: `appcast.xml` at the repository root
