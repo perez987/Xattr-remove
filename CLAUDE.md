@@ -23,18 +23,18 @@ Xattr-remove-2/
 │   ├── App-testing.md                     # Manual test scenarios
 │   └── Update-Xcode-service.md            # How to refresh the macOS Finder service cache
 ├── Xattr-remove.xcodeproj/                # Xcode project (open this to build)
-│   └── project.xcworkspace/xcshareddata/swiftpm/Package.resolved
 └── Xattr-remove/                          # Main app source
     ├── Xattr_removeApp.swift              # @main entry point; sets up WindowGroup, menus, Sparkle
     ├── UpdateController.swift             # Thin Sparkle wrapper (ObservableObject)
-    ├── Info.plist                         # App configuration; defines Finder service (macOS ≤14)
+    ├── Info.plist                         # App configuration
     ├── Xattr_remove.entitlements          # Sandboxing DISABLED (required for removexattr)
     ├── Assets.xcassets/                   # App icons and accent color
+    ├── Sparkle.xcframework/               # Sparkle framework (embedded directly, not via SPM)
     ├── Views/
     │   ├── ContentView.swift              # Drag-and-drop UI; delegates to FileProcessor
     │   └── CustomAlertView.swift          # Sheet-based alert (avoids icon shown by SwiftUI alerts)
     ├── Model/
-    │   ├── XattrManager.swift             # removexattr() wrapper; returns QuarantineRemovalResult
+    │   ├── XattrManager.swift             # removexattr() and codesign wrappers; returns result enums
     │   └── FileProcessor.swift            # ObservableObject; orchestrates processing + alerts
     └── Languages/
         ├── LanguageSelectorView.swift     # Language picker sheet (5 languages)
@@ -51,19 +51,20 @@ The app follows a three-layer separation of concerns:
 
 | Layer | File | Responsibility |
 |---|---|---|
-| Core | `XattrManager.swift` | Calls `removexattr()`, returns `QuarantineRemovalResult` enum |
+| Core | `XattrManager.swift` | Calls `removexattr()` and `codesign`; returns result enums; detects binary architecture |
 | Logic | `FileProcessor.swift` | Counts results, builds alert messages, schedules auto-quit |
-| UI | `ContentView.swift` | SwiftUI drag-and-drop, shows `CustomAlertView` as a sheet |
+| UI | `ContentView.swift` | SwiftUI drag-and-drop, re-sign checkbox, shows `CustomAlertView` as a sheet |
 
 ### Data flow
 
 1. User drops files onto the window → `ContentView.handleDrop()`
-2. URLs are collected on a serial `DispatchQueue`, then `FileProcessor.processFiles(_:)` is called
-3. Each file is processed in parallel on `DispatchQueue.global(qos: .userInitiated)`
-4. Results are posted back to a serial coordination queue and counted
-5. `group.notify` fires on the coordination queue → builds `AlertState`, dispatches to main thread
-6. On **success**: `CustomAlertView` sheet appears; app quits after 3 seconds (`exit(0)`)
-7. On **error**: sheet appears, no auto-quit (requires user acknowledgment)
+2. For a single file, `XattrManager.architectureDescription()` runs to detect the binary architecture; this result is displayed in the window and passed to `FileProcessor`
+3. URLs are collected on a serial `DispatchQueue`, then `FileProcessor.processFiles(_:shouldResign:architectureInfo:)` is called
+4. Each file is processed in parallel on `DispatchQueue.global(qos: .userInitiated)`: quarantine attribute is removed, and if `shouldResign` is true and the file is an `.app` bundle, it is re-signed via `codesign`
+5. Results are posted back to a serial coordination queue and counted
+6. `group.notify` fires on the coordination queue → builds `AlertState`, dispatches to main thread
+7. On **success**: `CustomAlertView` sheet appears; app quits after 5 seconds (`exit(0)`)
+8. On **error**: sheet appears, no auto-quit (requires user acknowledgment)
 
 ### `QuarantineRemovalResult` enum
 
@@ -74,16 +75,29 @@ case permissionDenied // EPERM / EACCES
 case otherError(String)
 ```
 
+### `ReSignResult` enum
+
+```swift
+case success          // Sparkle.framework and app bundle re-signed successfully
+case failure(String)  // codesign failed; message contains the error output
+```
+### Architecture detection
+
+```swift
+private static let architectureBundleExtensions = Set(["app", "framework", "bundle"])
+private static let architectureLibraryExtensions = Set(["dylib", "so"])
+```
+
 ### Thread safety
 
-All counter increments (`removedCount`, `notFoundCount`, `failedCount`) run on the same **serial** queue. `group.notify` targets that same queue, so reads are guaranteed to happen after all writes.
+All counter increments (`removedCount`, `notFoundCount`, `xattrFailedCount`, `reSignSuccessCount`, `reSignFailedCount`) run on the same **serial** queue. `group.notify` targets that same queue, so reads are guaranteed to happen after all writes.
 
 ## Building
 
 1. Open `Xattr-remove.xcodeproj` in Xcode (14.0+)
 2. Select the **Xattr-remove** scheme
 3. **⌘B** to build, **⌘R** to run
-4. No external setup needed; SPM resolves Sparkle automatically on first build
+4. No external setup needed; Sparkle is embedded as `Sparkle.xcframework` and requires no additional package resolution
 
 There is **no command-line build path** (no `Makefile`, no `xcodebuild` scripts). Always build through Xcode.
 
@@ -95,6 +109,7 @@ There are **no automated tests**. All testing is manual. Key scenarios are docum
 - Single / multiple files without the attribute → "not present" success + auto-quit
 - Mixed batches → mixed success message + auto-quit
 - Files in protected locations → error alert, no auto-quit
+- Re-sign option enabled with an `.app` bundle → quarantine removed + Sparkle and app re-signed
 
 **Useful shell commands for manual testing:**
 
@@ -121,19 +136,21 @@ Language selection is persisted in `UserDefaults` (`AppleLanguages` key). A rest
 
 ## Sparkle (Auto-Updates)
 
-- Integrated via integrated framework (`Sparkle 2.9.2`)
+- Integrated via embedded framework (`Sparkle 2.9.2`) — `Sparkle.xcframework` is checked in directly under `Xattr-remove/`
 - `UpdateController.swift` wraps `SPUStandardUpdaterController`
 - Menu item: **⌘U** ("Check for Updates…") — enabled only when `canCheckForUpdates` is `true`
 - Update feed: `appcast.xml` at the repository root
-```
 
 ## Key Design Decisions
 
 - **No sandbox**: Removed (`com.apple.security.app-sandbox = false`) because the macOS sandbox blocks `removexattr()` even with appropriate entitlements.
-- **Auto-quit on success**: Intentional droplet behaviour — 3 seconds after a success alert the app calls `exit(0)`. Error alerts do not trigger auto-quit.
+- **Auto-quit on success**: Intentional droplet behaviour — 5 seconds after a success alert the app calls `exit(0)`. Error alerts do not trigger auto-quit.
 - **`CustomAlertView` instead of SwiftUI `.alert`**: Avoids the app icon shown by SwiftUI alerts on Sonoma/Sequoia.
 - **`AlertState` struct**: Groups all alert properties so that a single `objectWillChange` is emitted, preventing "Publishing changes from within view updates" warnings.
 - **`XATTR_NOFOLLOW` flag**: Prevents following symbolic links during attribute removal.
+- **Re-sign checkbox (non-persistent)**: The re-sign option uses `@State` (not `@AppStorage`) so it always starts unchecked on launch — users must explicitly opt in each session.
+- **Re-sign order**: Sparkle.framework is re-signed before the app bundle; this order is required for a valid code signature.
+- **Architecture detection**: When a single file is dropped, `XattrManager.architectureDescription()` runs `lipo -archs` on the binary and displays the result (Intel, Silicon, or Universal) in the window and the success alert.
 
 ## Console Logs
 

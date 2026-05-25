@@ -15,6 +15,8 @@ struct ContentView: View {
 //    @AppStorage("resign_after_processing") private var shouldResignAfterProcessing = false
     //  Re-sign option always false at run
     @State private var shouldResignAfterProcessing = false
+    @State private var architectureInfoText: String?
+    @State private var latestDropID = UUID()
     @EnvironmentObject var fileProcessor: FileProcessor
     
     // Logger for UI events
@@ -40,11 +42,27 @@ struct ContentView: View {
                 NSLocalizedString("resign_after_processing_option", comment: "Option to re-sign dropped app bundles"),
                 isOn: $shouldResignAfterProcessing
             )
-            .padding(.leading, 20)
+//            .padding(.leading, 20)
             .foregroundColor(.secondary)
             .multilineTextAlignment(.leading)
             .toggleStyle(.checkbox)
             .frame(maxWidth: 240,)
+            
+            Divider()
+
+            if let architectureInfoText {
+                Text(architectureInfoText)
+                    .font(.body)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.leading)
+//                    .frame(maxWidth: 240, alignment: .leading)
+                    .accessibilityLabel(
+                        String.localizedStringWithFormat(
+                            NSLocalizedString("architecture_accessibility_label_format", comment: "Accessibility label for architecture info text"),
+                            architectureInfoText
+                        )
+                    )
+            }
         }
         .frame(
             minWidth: 360,
@@ -70,6 +88,9 @@ struct ContentView: View {
     }
     
     private func handleDrop(providers: [NSItemProvider]) {
+        let dropID = UUID()
+        latestDropID = dropID
+
         let group = DispatchGroup()
         let queue = DispatchQueue(label: "com.xattr-rm.url-collection")
         var urls: [URL] = []
@@ -95,8 +116,32 @@ struct ContentView: View {
         
         // Process all collected URLs after loading completes
         group.notify(queue: queue) {
-            self.fileProcessor.processFiles(urls, shouldResign: self.shouldResignAfterProcessing)
+            if urls.count == 1 {
+                let droppedURL = urls[0]
+                DispatchQueue.global(qos: .userInitiated).async {
+                    let architectureLabel = XattrManager.architectureDescription(for: droppedURL)
+                    DispatchQueue.main.async {
+                        guard self.latestDropID == dropID else { return }
+                        self.architectureInfoText = architectureLabel
+                        self.processDroppedFiles(urls, architectureInfo: architectureLabel)
+                    }
+                }
+            } else {
+                DispatchQueue.main.async {
+                    guard self.latestDropID == dropID else { return }
+                    self.architectureInfoText = nil
+                    self.processDroppedFiles(urls, architectureInfo: nil)
+                }
+            }
         }
+    }
+
+    private func processDroppedFiles(_ urls: [URL], architectureInfo: String?) {
+        fileProcessor.processFiles(
+            urls,
+            shouldResign: shouldResignAfterProcessing,
+            architectureInfo: architectureInfo
+        )
     }
 }
 

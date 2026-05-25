@@ -24,12 +24,12 @@ class FileProcessor: ObservableObject {
     private let logger = Logger(subsystem: "com.xattr-rm.app", category: "FileProcessor")
 
     // Delay for displaying success alert before auto-quit
-    private let alertDisplayDuration: TimeInterval = 3.0
+    private let alertDisplayDuration: TimeInterval = 5.0
     // Delay after dismissing alert before terminating app (needed for macOS Sonoma compatibility)
     private let alertDismissalDelay: TimeInterval = 0.2
 
     // Process a list of file URLs
-    func processFiles(_ urls: [URL], shouldResign: Bool = false) {
+    func processFiles(_ urls: [URL], shouldResign: Bool = false, architectureInfo: String? = nil) {
         guard !urls.isEmpty else { return }
 
         logger.info("Processing \(urls.count) file(s)")
@@ -96,7 +96,7 @@ class FileProcessor: ObservableObject {
             let successfullyProcessedCount = finalRemovedCount + finalNotFoundCount
 
             // Build alert state locally then assign once to trigger a single objectWillChange
-            DispatchQueue.main.asyncAfter(deadline: .now()) {
+            DispatchQueue.main.asyncAfter(deadline: .now()) { [self] in
                 var newState = AlertState()
 
                 if finalXattrFailedCount > 0 || finalReSignFailedCount > 0 {
@@ -119,6 +119,7 @@ class FileProcessor: ObservableObject {
                             finalXattrFailedCount
                         )
                     }
+                    appendArchitectureInfo(architectureInfo, to: &newState)
                     newState.isPresented = true
                     self.alertState = newState
                 } else if finalRemovedCount > 0 || finalNotFoundCount > 0 {
@@ -174,6 +175,7 @@ class FileProcessor: ObservableObject {
                         }
                     }
 
+                    appendArchitectureInfo(architectureInfo, to: &newState)
                     newState.isPresented = true
                     self.alertState = newState
 
@@ -189,5 +191,10 @@ class FileProcessor: ObservableObject {
                 }
             }
         }
+    }
+
+    private func appendArchitectureInfo(_ architectureInfo: String?, to alertState: inout AlertState) {
+        guard let architectureInfo, !architectureInfo.isEmpty else { return }
+        alertState.message += "\n\n\(architectureInfo)"
     }
 }

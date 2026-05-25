@@ -7,7 +7,13 @@
 /* UI Strings */
 "drop_file_here" = "Drop file here";
 "remove_quarantine_subtitle" = "to remove com.apple.quarantine";
-"resign_after_processing_option" = "   Re-sign  app  and Sparkle";
+"resign_after_processing_option" = "   Re-sign app and Sparkle";
+"architecture_label_format" = "Architecture: %@";
+"architecture_intel_silicon" = "Intel and Silicon";
+"architecture_intel_only" = "Intel only";
+"architecture_silicon_only" = "Silicon only";
+"architecture_other_format" = "Other (%@)";
+"architecture_accessibility_label_format" = "Binary architecture information: %@";
 "ok_button" = "OK";
 
 /* Alert Titles */

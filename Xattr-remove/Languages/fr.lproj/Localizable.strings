@@ -8,6 +8,12 @@
 "drop_file_here" = "Déposez le fichier ici";
 "remove_quarantine_subtitle" = "pour supprimer com.apple.quarantine";
 "resign_after_processing_option" = "   Re-signer app et Sparkle";
+"architecture_label_format" = "Architecture : %@";
+"architecture_intel_silicon" = "Intel et Silicon";
+"architecture_intel_only" = "Intel uniquement";
+"architecture_silicon_only" = "Silicon uniquement";
+"architecture_other_format" = "Autre (%@)";
+"architecture_accessibility_label_format" = "Informations sur l'architecture binaire : %@";
 "ok_button" = "OK";
 
 /* Alert Titles */

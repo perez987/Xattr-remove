@@ -10,7 +10,11 @@
 
 SwiftUI application for macOS that removes `com.apple.quarantine` extended attribute from files downloaded from the Internet. Works by accepting files via drag and drop onto the app window.
 
+### Quarantine attribute removal
+
 This app is a simpler and lighter version of [Xattr Editor](https://github.com/perez987/Xattr-Editor). Instead of displaying and editing (removing, modifying, adding) extended attributes, it performs a single task: removing `com.apple.quarantine` in a quick way from files downloaded from the Internet so that they can be opened in macOS without Gatekeeper warnings.
+
+### Digital re-sign (optional)
 
 You can also optionally digitally self-sign *ad-hoc* an app (and the Sparkle framework) by replacing its certificate. This is especially useful if, trying to run the app for the first time, even after removing the `com.apple.quarantine` attribute, the app crashes with a Sparkle-related error. This option is equivalent to running these commands:
 
@@ -22,16 +26,22 @@ You can also optionally digitally self-sign *ad-hoc* an app (and the Sparkle fra
   <App-name>.app
 ```
 
+### Architecture detection
+
+If the file dragged onto the window is an .app, a macOS executable or a library, Xattr-remove runs `lipo -archs` on the binary. The result (architecture/s of the file) is shown in the main window while processing, and appended to the success alert message. It can be `Intel and Silicon`, `Only Intel` or `Only Silicon`. For multiple-file drops, no architecture info is shown (it would be ambiguous). Non-binary files (plain documents, scripts, etc.) silently return nothing and no label appears.
+
 | Screenshots |
 |:----|
 | ![Main](Images/Main-window.png) |
-| ![Qurantine](Images/7-files-1-app.png) |
-| ![Unquarantine](Images/6-files-no-app.png) |
+| ![Unquarantine](Images/6files-noapp.png) |
+| ![Architecture](Images/1file-architecture.png) |
+| ![Re-sign](Images/7files-1app.png) |
 
 ## Features
 
 - Drop files onto the app window to remove the quarantine attribute
 - Optional checkbox to re-sign app bundles (Sparkle first, app second) after removing the `quarantine` attribute
+- Information about detected architectures if it is a macOS binary file
 - Built with Swift and SwiftUI
 - Handle errors (whether the attribute exists or not)
 - Supports all file types including apps and executables
@@ -51,7 +61,7 @@ Open `Xattr-remove.xcodeproj` in Xcode and build the project. The app requires m
 3. The quarantine attribute (if it exists) will be automatically removed
 4. (Optional) Enable the re-sign checkbox before dropping files to run ad-hoc `codesign` on `Sparkle.framework` and then the app bundle
 5. The user gets an alert as feedback
-6. The app automatically quits 3 seconds after displaying a success alert
+6. The app automatically quits 5 seconds after displaying a success alert
 
 **Note:** Files must be dropped onto the app window. Dropping files onto the app icon in Finder or Dock is not supported due to macOS Gatekeeper restrictions with quarantined executables.
 

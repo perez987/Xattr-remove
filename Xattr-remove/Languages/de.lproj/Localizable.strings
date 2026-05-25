@@ -8,6 +8,12 @@
 "drop_file_here" = "Datei hier ablegen";
 "remove_quarantine_subtitle" = "com.apple.quarantine entfernen";
 "resign_after_processing_option" = "   Re-Sign-App und Sparkle";
+"architecture_label_format" = "Architektur: %@";
+"architecture_intel_silicon" = "Intel und Silicon";
+"architecture_intel_only" = "Nur Intel";
+"architecture_silicon_only" = "Nur Silicon";
+"architecture_other_format" = "Andere (%@)";
+"architecture_accessibility_label_format" = "Informationen zur Binärarchitektur: %@";
 "ok_button" = "OK";
 
 /* Alert Titles */

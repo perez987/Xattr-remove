@@ -24,12 +24,135 @@ enum ReSignResult {
 class XattrManager {
     // The quarantine attribute name
     private static let quarantineAttribute = "com.apple.quarantine"
+    private static let lipoTimeout: DispatchTimeInterval = .seconds(5)
+    private static let architectureBundleExtensions = Set(["app", "framework", "bundle"])
+    private static let architectureLibraryExtensions = Set(["dylib", "so"])
     
    /// XATTR_NOFOLLOW flag - don't follow symbolic links
     private static let XATTR_NOFOLLOW: Int32 = 0x0001
     
     // Logger for xattr operations
     private static let logger = Logger(subsystem: "com.xattr-rm.app", category: "XattrManager")
+
+    // Returns a localized architecture description for .app bundles, executables, and libraries.
+    // Returns nil when the dropped item is not a supported architecture candidate or cannot be resolved.
+    static func architectureDescription(for url: URL) -> String? {
+        guard let architectureTargetURL = architectureTargetURL(for: url) else {
+            return nil
+        }
+
+        let lipoPath = "/usr/bin/lipo"
+        guard FileManager.default.fileExists(atPath: lipoPath) else {
+            logger.error("lipo not found at expected path: \(lipoPath)")
+            return nil
+        }
+
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: lipoPath)
+        process.arguments = ["-archs", architectureTargetURL.path]
+
+        let outputPipe = Pipe()
+        process.standardOutput = outputPipe
+        process.standardError = outputPipe
+
+        do {
+            let exitSemaphore = DispatchSemaphore(value: 0)
+            process.terminationHandler = { _ in
+                exitSemaphore.signal()
+            }
+
+            try process.run()
+            let waitResult = exitSemaphore.wait(timeout: .now() + lipoTimeout)
+            if waitResult == .timedOut {
+                process.terminate()
+                logger.error("Timed out while running lipo for path: \(architectureTargetURL.path)")
+                return nil
+            }
+
+            guard process.terminationStatus == 0 else {
+                return nil
+            }
+
+            let data = outputPipe.fileHandleForReading.readDataToEndOfFile()
+            let rawOutput = String(data: data, encoding: .utf8)?
+                .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+            let tokens = rawOutput
+                .components(separatedBy: .whitespacesAndNewlines)
+                .filter { !$0.isEmpty }
+
+            let hasIntel = tokens.contains { $0 == "x86_64" || $0 == "i386" }
+            let hasSilicon = tokens.contains { $0 == "arm64" || $0 == "arm64e" }
+
+            let architectureValue: String
+            if hasIntel && hasSilicon {
+                architectureValue = NSLocalizedString("architecture_intel_silicon", comment: "Architecture label value for universal binary")
+            } else if hasIntel {
+                architectureValue = NSLocalizedString("architecture_intel_only", comment: "Architecture label value for Intel-only binary")
+            } else if hasSilicon {
+                architectureValue = NSLocalizedString("architecture_silicon_only", comment: "Architecture label value for Apple Silicon-only binary")
+            } else if !tokens.isEmpty {
+                architectureValue = String.localizedStringWithFormat(
+                    NSLocalizedString("architecture_other_format", comment: "Architecture label value for other/unknown architectures"),
+                    tokens.joined(separator: ", ")
+                )
+            } else {
+                return nil
+            }
+
+            return String.localizedStringWithFormat(
+                NSLocalizedString("architecture_label_format", comment: "Architecture info label format"),
+                architectureValue
+            )
+        } catch {
+            return nil
+        }
+    }
+
+    private static func architectureTargetURL(for url: URL) -> URL? {
+        if architectureBundleExtensions.contains(url.pathExtension.lowercased()) {
+            return bundleExecutableURL(for: url)
+        }
+
+        guard isArchitectureCandidateFile(url) else {
+            return nil
+        }
+
+        return url
+    }
+
+    private static func bundleExecutableURL(for bundleURL: URL) -> URL? {
+        guard let bundle = Bundle(url: bundleURL) else {
+            logger.debug("Unable to open bundle for architecture lookup: \(bundleURL.path)")
+            return nil
+        }
+
+        guard let executableURL = bundle.executableURL else {
+            logger.debug("Bundle has no executable for architecture lookup: \(bundleURL.path)")
+            return nil
+        }
+
+        guard FileManager.default.fileExists(atPath: executableURL.path) else {
+            logger.debug("Bundle executable missing for architecture lookup: \(executableURL.path)")
+            return nil
+        }
+
+        return executableURL
+    }
+
+    private static func isArchitectureCandidateFile(_ url: URL) -> Bool {
+        var isDirectory: ObjCBool = false
+        guard FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory),
+              !isDirectory.boolValue else {
+            return false
+        }
+
+        if FileManager.default.isExecutableFile(atPath: url.path) {
+            return true
+        }
+
+        return architectureLibraryExtensions.contains(url.pathExtension.lowercased())
+    }
     
     // Removes the com.apple.quarantine extended attribute from a file
     // - Parameter url: The URL of the file to process
