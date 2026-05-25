@@ -11,10 +11,10 @@
 **Rationale:**
 
 - Droplet applications (utilities that accept files via drag-and-drop) traditionally auto-quit after showing feedback
-- The 3-second timer runs independently of user interaction with the alert
+- The 5-second timer runs independently of user interaction with the alert
 - This provides a consistent, predictable behavior: drop files → see result → app quits
 - Users of droplet apps expect this behavior and don't need to manually dismiss alerts or quit the app
-- If a user dismisses the alert early, the app will still quit after 3 seconds total, which is acceptable UX for this app category
+- If a user dismisses the alert early, the app will still quit after 5 seconds total, which is acceptable UX for this app category
 
 ### 2. Thread Safety of Counter Variables
 
@@ -36,12 +36,12 @@
 ```bash
 1. Create serial queue
 2. For each file:
-   - Process on background thread
+   - Process on background thread (remove xattr; optionally re-sign if .app)
    - Post result to serial queue (queue.async)
-   - Increment appropriate counter
+   - Increment appropriate counter(s)
    - Call group.leave()
 3. group.notify(queue: queue) { 
-   - Reads counters (guaranteed to be after all increments)
+   - Reads all counters (guaranteed to be after all increments)
 }
 ```
 
@@ -51,9 +51,31 @@
 
 The implementation follows a clean separation of concerns:
 
-1. **XattrManager**: Low-level xattr operations, returns enum results
+1. **XattrManager**: Low-level xattr operations (`removexattr`), ad-hoc code signing (`codesign`), and binary architecture detection (`lipo`); returns enum results
 2. **FileProcessor**: Coordination, counting, and UI feedback
 3. **ContentView**: UI presentation and drag-and-drop handling on the window
+
+### Re-sign Feature
+
+When the "Re-sign app and Sparkle" checkbox is checked, the app performs ad-hoc code signing on dropped `.app` bundles after removing the quarantine attribute. The re-sign logic:
+
+1. Checks that the dropped item is an `.app` bundle
+2. Locates `Contents/Frameworks/Sparkle.framework` inside the bundle
+3. Re-signs Sparkle.framework first (required order for a valid signature)
+4. Re-signs the outer app bundle second
+
+This is equivalent to:
+
+```bash
+codesign --force --deep --sign - <App>.app/Contents/Frameworks/Sparkle.framework
+codesign --force --deep --sign - <App>.app
+```
+
+The checkbox is intentionally **non-persistent** (`@State`, not `@AppStorage`) so it always starts unchecked. This prevents accidental re-signing in cases where the user previously checked it and forgot.
+
+### Architecture Detection
+
+When a single file is dropped, `XattrManager.architectureDescription()` runs `lipo -archs` on the binary (or on the bundle's main executable for `.app`/`.framework`/`.bundle`). The result is shown in the main window while processing, and appended to the success alert message. For multiple-file drops no architecture info is shown (it would be ambiguous). Non-binary files (plain documents, scripts, etc.) silently return `nil` and no label appears.
 
 ### Why Not Use `@Published` for Counters?
 
@@ -71,11 +93,14 @@ The counters are not `@Published` properties because:
 - Files with attribute removed: Success, auto-quit
 - Files without attribute: Also success (no action needed), auto-quit
 - Mixed results: Success, auto-quit
+- Re-sign requested, no `.app` bundles dropped: Success, auto-quit
+- Re-sign requested and succeeded: Success, auto-quit
 
 **Error Cases (No Auto-Quit):**
 
-- Permission denied: Error, requires user acknowledgment
-- Other errors: Error, requires user acknowledgment
+- Permission denied on xattr removal: Error, requires user acknowledgment
+- Other xattr errors: Error, requires user acknowledgment
+- Re-sign failed (codesign error): Error, requires user acknowledgment
 
 This ensures users are aware of problems but don't need to manually quit the app on success.
 
@@ -92,7 +117,10 @@ Examples:
 - "Successfully removed quarantine attribute from file." (1 removed)
 - "Successfully removed quarantine attribute from 3 files." (3 removed)
 - "Successfully processed 1 file (quarantine attribute was not present)." (1 clean)
-- "Successfully processed 5 files (3 removed, 2 already cleaned)." (mixed)
+- "Successfully processed 5 files (com.apple.quarantine was present in 3 and absent in 2)." (mixed)
+- "Successfully processed 2 file(s) and re-signed 1 app bundle." (re-sign: 1 app)
+- "Successfully processed 3 file(s) and re-signed 2 app bundles." (re-sign: multiple apps)
+- "Quarantine was removed, but re-signing failed for 1 item." (re-sign failure)
 
 ## Testing Considerations
 
@@ -109,28 +137,47 @@ Since this is a macOS app with UI and file system interactions:
 ### What to Test
 
 1. **Drag and drop onto the app window:**
+   
    - Files must be dropped directly onto the app window
 
 2. **All message variations display correctly:**
+   
    - Single/multiple removed
    - Single/multiple clean
    - Mixed results
    - Single/multiple errors
+   - Re-sign success (0, 1, or multiple bundles)
+   - Re-sign failure
 
 3. **Auto-quit works correctly:**
-   - Quits after exactly 3 seconds on success
+   
+   - Quits after exactly 5 seconds on success
    - Does NOT quit on errors
 
 4. **Quarantine attribute detection:**
+   
    - Files downloaded from internet (have attribute)
    - Locally created files (no attribute)
    - Mixed batches
+
+5. **Architecture detection (single file only):**
+   
+   - Binary/app shows architecture label
+   - Plain file shows no label
+   - Multiple files show no label
+
+6. **Re-sign checkbox:**
+   
+   - Starts unchecked on every launch
+   - Re-signs only `.app` bundles, not other file types
+   - Correct re-sign order: Sparkle.framework first, then the app
 
 ## Performance Considerations
 
 ### Parallel Processing
 
 Files are processed in parallel using `DispatchQueue.global(qos: .userInitiated)`:
+
 - Multiple files can be processed simultaneously
 - Results are serialized on the coordination queue
 - UI remains responsive throughout
@@ -143,7 +190,7 @@ Files are processed in parallel using `DispatchQueue.global(qos: .userInitiated)
 
 ### Timing
 
-- The 3-second delay is long enough for users to read the message
+- The 5-second delay is long enough for users to read the message
 - Short enough to not feel like the app is hanging
 - Could be made configurable if needed in the future
 
@@ -156,73 +203,15 @@ Files are processed in parallel using `DispatchQueue.global(qos: .userInitiated)
 3. **Sound feedback**: Audio confirmation on completion
 4. **Detailed logging**: Export processing history to file
 
-## Window Visibility Fix for Sequoia/Tahoe
-
-### Issue
-When the app is launched from a Finder service on macOS Sequoia and Tahoe, the window doesn't appear. Clicking the Dock icon makes it appear immediately. Works fine on Sonoma.
-
-### Root Cause
-Previous implementation tried to enforce window visibility with delays and retry logic BEFORE SwiftUI's WindowGroup created the window. The timing was unreliable because:
-- SwiftUI creates windows asynchronously
-- Service handler runs before window creation completes
-- Delays/retries couldn't reliably detect when the window existed
-
-### Solution (Implemented)
-Window visibility is now enforced AFTER we KNOW the window exists - in ContentView.onAppear:
-
-1. Service handler activates the app to trigger window creation
-2. Queues files for processing  
-3. SwiftUI creates the window
-4. ContentView.onAppear calls ensureWindowVisibilityAfterCreation()
-5. Window visibility is enforced using orderFrontRegardless() and floating level
-
-**Benefits:**
-- No delays or retries needed
-- Simpler code (removed 113 lines of complex timing logic)
-- More reliable - uses SwiftUI's lifecycle instead of guessing
-- Only enforces visibility when launched from service
-
-**Key Methods:**
-- `ensureWindowVisibilityAfterCreation()`: Called from ContentView.onAppear
-- `bringAppToForeground()`: Activates app and shows windows
-- `showAllWindows()`: Applies aggressive visibility settings
-
-### Final Resolution (v1.4+)
-Despite multiple attempts to fix window visibility issues on macOS Sequoia (15.x) and Tahoe (16.x), including:
-- Various timing delays and retry logic
-- Multiple window activation strategies (orderFrontRegardless, floating level, etc.)
-- SwiftUI lifecycle-based approaches
-- Window collection behavior modifications
-
-The Finder service window visibility remains unreliable on these newer macOS versions. The root cause appears to be fundamental changes in how macOS handles window activation from background services in Sequoia and later.
-
-**Current Solution:**
-- The Finder service is now **conditionally disabled** on macOS 15.0+ (Sequoia, Tahoe, and later)
-- Service registration is checked via `isFinderServiceSupported` property
-- On Sequoia+, `NSApp.servicesProvider` is not set, effectively disabling the service
-- Users on these versions are directed to use the drag-and-drop functionality instead
-- The service remains fully functional on macOS Sonoma (14.x) and earlier
-
-**Code Changes:**
-- Added `isFinderServiceSupported` property to check macOS version
-- Modified `applicationWillFinishLaunching` to conditionally register the service
-- Added version check in `removeQuarantine` service handler as additional safety
-- Updated documentation (README.md, README-ES.md) to inform users of the limitation
-
-**User Impact:**
-- macOS Sonoma (14.x) and earlier: Finder service works as before
-- macOS Sequoia (15.x) and Tahoe (16.x): Service not available, use drag-and-drop instead
-- Clear documentation helps users understand the limitation
-- Drag-and-drop remains fully functional on all supported macOS versions
-
 ## Conclusion
 
 The implementation successfully addresses all requirements:
 
 - Differentiated alert messages
-- 3-second auto-quit on success
+- 5-second auto-quit on success
 - Error handling maintained
-- Finder service integration with reliable window visibility on Sequoia/Tahoe
+- Architecture detection for single-file drops
+- Optional re-sign of Sparkle.framework and app bundle
 - Documentation updated
 - Thread-safe implementation
 - Clean, maintainable code

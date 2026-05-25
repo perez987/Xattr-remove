@@ -5,15 +5,18 @@ This guide provides comprehensive testing scenarios to validate the application.
 ## Changes Implemented
 
 1. **Differentiated Alert Messages**: The app  shows different messages based on:
-
-2. 
+ 
    - Files where quarantine attribute was removed
    - Files where quarantine attribute was not present
    - Mixed results (some removed, some already clean)
 
-3. **Auto-Quit Functionality**: The app automatically quits 3 seconds after displaying a success alert
+3. **Auto-Quit Functionality**: The app automatically quits 5 seconds after displaying a success alert
 
 4. **Updated Error Handling**: Errors do not trigger auto-quit (requires user acknowledgment)
+
+5. **Re-sign Feature**: Optional checkbox to ad-hoc re-sign Sparkle.framework and the app bundle after quarantine removal
+
+6. **Architecture Detection**: For single-file drops, the binary architecture (Intel, Silicon, Universal) is detected and shown in the window and success alert
 
 ## Testing Scenarios
 
@@ -26,7 +29,7 @@ Download a file from the internet to ensure it has the quarantine attribute
 1. Drag the downloaded file onto the app window
 2. **Expected Result:** 
    - Alert shows: "Successfully removed quarantine attribute from file."
-   - Alert disappears and app quits after 3 seconds
+   - Alert disappears and app quits after 5 seconds
 
 ### Scenario 2: Multiple Files with Quarantine Attribute
 
@@ -37,7 +40,7 @@ Download multiple files from the internet
 1. Select all downloaded files and drag them onto the app window
 2. **Expected Result:** 
    - Alert shows: "Successfully removed quarantine attribute from N files." (where N is the number of files)
-   - Alert disappears and app quits after 3 seconds
+   - Alert disappears and app quits after 5 seconds
 
 ### Scenario 3: Single File without Quarantine Attribute
 
@@ -48,7 +51,7 @@ Create a new file locally (e.g., `touch test.txt`)
 1. Drag the locally created file onto the app
 2. **Expected Result:** 
    - Alert shows: "Successfully processed 1 file (quarantine attribute was not present)."
-   - Alert disappears and app quits after 3 seconds
+   - Alert disappears and app quits after 5 seconds
 
 ### Scenario 4: Multiple Files without Quarantine Attribute
 
@@ -59,7 +62,7 @@ Create multiple files locally (e.g., `touch test1.txt test2.txt test3.txt`)
 1. Select all locally created files and drag them onto the app
 2. **Expected Result:** 
    - Alert shows: "Successfully processed N files (quarantine attribute was not present)." (where N is the number of files)
-   - Alert disappears and app quits after 3 seconds
+   - Alert disappears and app quits after 5 seconds
 
 ### Scenario 5: Mixed Files (Some with, Some without Quarantine Attribute)
 
@@ -71,11 +74,11 @@ Prepare:
 
 1. Select all mixed files and drag them onto the app
 2. **Expected Result:** 
-   - Alert shows: "Successfully processed N files (X removed, Y already cleaned)."
+   - Alert shows: "Successfully processed N files (com.apple.quarantine was present in X and absent in Y)."
      - N = total number of files
      - X = number of files where attribute was removed
      - Y = number of files where attribute was not present
-   - Alert disappears and app quits after 3 seconds
+   - Alert disappears and app quits after 5 seconds
 
 ### Scenario 6: Error Handling (Protected File)
 
@@ -110,39 +113,62 @@ Prepare a mix of:
 
 After completing all scenarios, verify:
 
-- [ ] Drag and drop onto the app window works correctly
-  - [ ] Visual feedback (blue highlight) appears when dragging files over the window
-  - [ ] Files are processed successfully when dropped
-- [ ] Alert messages correctly reflect the processing result
-- [ ] Single vs. multiple file messages are grammatically correct
-- [ ] Auto-quit occurs exactly 3 seconds after success alert appears
-- [ ] Auto-quit does NOT occur for error alerts
-- [ ] Error alerts require user interaction to dismiss
-- [ ] App remains responsive throughout all operations
-- [ ] Console logs show appropriate information for debugging
+- [x] Drag and drop onto the app window works correctly
+  - [x] Visual feedback (blue highlight) appears when dragging files over the window
+  - [x] Files are processed successfully when dropped
+- [x] Alert messages correctly reflect the processing result
+- [x] Single vs. multiple file messages are grammatically correct
+- [x] Auto-quit occurs exactly 5 seconds after success alert appears
+- [x] Auto-quit does NOT occur for error alerts
+- [x] Error alerts require user interaction to dismiss
+- [x] App remains responsive throughout all operations
+- [x] Console logs show appropriate information for debugging
+- [x] Architecture label appears in window (and success alert) for single-file drops that are binaries or app bundles
+- [x] Re-sign checkbox starts unchecked on every launch (non-persistent)
+- [x] Re-sign: Sparkle.framework is signed before the app bundle
 
-### Finder Service Testing (macOS Version-Specific)
+### Scenario 8: Re-sign Option
 
-The Finder service availability depends on your macOS version:
+Download an `.app` bundle from the internet that includes Sparkle.framework.
 
-**On macOS Sonoma (14.x) and earlier:**
-- [ ] Finder service appears in Services menu when right-clicking files
-- [ ] Service launches the app and processes files correctly
-- [ ] Window becomes visible when service is invoked
-- [ ] Check console logs show: "Finder service registered (macOS 14)"
+**Test:**
 
-**On macOS Sequoia (15.x) and Tahoe (16.x):**
-- [ ] Finder service does NOT appear in Services menu (expected behavior)
-- [ ] Check console logs show: "Finder service disabled on macOS 15.x (Sequoia/Tahoe or later) due to window visibility issues"
-- [ ] Drag-and-drop functionality remains fully functional
+1. Enable the "Re-sign app and Sparkle" checkbox
+2. Drag the `.app` bundle onto the app window
+3. **Expected Result:**
+   - Quarantine attribute is removed
+   - Sparkle.framework is re-signed first, then the app bundle
+   - Alert shows: "Successfully processed 1 file(s) and re-signed 1 app bundle."
+   - Alert disappears and app quits after 5 seconds
 
-**To test the Finder service on supported versions:**
-1. Build and run the app in Xcode
-2. Update the services cache: `/System/Library/CoreServices/pbs -flush;/System/Library/CoreServices/pbs -update`
-3. Right-click on downloaded files in Finder
-4. Look for "⎋ com.apple.quarantine" in the Services submenu
-5. Select the service and verify the app launches with window visible
-6. Verify files are processed and alert appears
+**Test with multiple files including one or more `.app` bundles:**
+
+1. Enable the re-sign checkbox
+2. Drag a mix of files (some apps, some non-app files) onto the window
+3. **Expected Result:**
+   - All files have quarantine removed
+   - Only `.app` bundles are re-signed (non-app files are skipped)
+   - Alert reports total processed count and number of re-signed bundles
+
+**Test with no `.app` bundles (re-sign enabled):**
+
+1. Enable the re-sign checkbox
+2. Drag only non-app files (e.g., `.zip`, `.dmg`, plain files)
+3. **Expected Result:**
+   - Alert shows: "Successfully processed N file(s). The dropped items contained no app bundles to re-sign."
+   - Alert disappears and app quits after 5 seconds
+
+### Scenario 9: Architecture Detection (Single File)
+
+Drop a single binary, library, or `.app` bundle onto the window.
+
+**Expected Results:**
+
+- For a Universal binary: window shows "Architecture: Intel and Silicon"; success alert includes this info
+- For Apple Silicon only: "Architecture: Silicon only"
+- For Intel only: "Architecture: Intel only"
+- For a plain text file or non-binary: no architecture label is shown
+- For multiple files dropped at once: no architecture label is shown
 
 ## Console Output
 
@@ -150,28 +176,34 @@ When running from Xcode, you should see console logs like:
 
 ```
 Processing N file(s)
-Processing complete: X removed, Y not found, Z failed
+Processing complete: X removed, Y not found, Z xattr failed, W re-signed, V re-sign failed
 ```
 
 Where:
+
 - N = total files processed
 - X = files where quarantine attribute was removed
 - Y = files where attribute was not present
-- Z = files that failed to process
+- Z = files that failed xattr removal
+- W = app bundles successfully re-signed
+- V = app bundles where re-signing failed
 
 ## Notes
 
 - The quarantine attribute is typically added by macOS to files downloaded from the internet
 - Local files (created with `touch`, TextEdit, etc.) typically don't have this attribute
 - You can manually add the quarantine attribute for testing using:
+  
   ```bash
   xattr -w com.apple.quarantine "0000;00000000;Safari;" test.txt
   ```
 - You can check if a file has the quarantine attribute using:
+  
   ```bash
   xattr -l test.txt
   ```
 - To remove it manually for re-testing:
+  
   ```bash
   xattr -d com.apple.quarantine test.txt
   ```

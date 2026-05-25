@@ -1,4 +1,4 @@
-### Updating the Xcode Service after building new code
+### Updating Xcode Service after building new code
 
 When you build and run a new app version from Xcode, macOS may continue using the cached version of the Finder service. To force macOS to use the updated service:
 

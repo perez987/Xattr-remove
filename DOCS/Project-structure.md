@@ -8,22 +8,26 @@
 - Visual feedback when files are dragged over (blue color)
 - Accepts file drops onto the app window via `.onDrop()` modifier
 - Background processing to avoid UI blocking
-- Auto-quit after 3 seconds following successful processing
+- Optional re-sign checkbox (non-persistent; unchecked on each launch)
+- Architecture info label shown for single-file drops (binary, library, or app bundle)
+- Auto-quit after 5 seconds following successful processing
 
 ### 2. Quarantine Attribute Removal (XattrManager.swift)
 
 - Uses `removexattr()` system call
-- Handles three cases:
+- Handles four cases:
   - Success: Attribute removed
   - ENOATTR: Attribute doesn't exist (not an error)
+  - EPERM/EACCES: Permission denied
   - Other errors: Logged but handled gracefully
-- Proper logging with os.Logger
+- Basic console logging with print statements
+- Ad-hoc re-sign via `codesign --force --deep --sign -` (Sparkle.framework first, then app bundle)
+- Architecture detection via `lipo -archs` for binaries, libraries, and app bundles
 
 ### 3. Window-Only Operation
 
-- SwiftUI App structure with lightweight AppDelegate (via `NSApplicationDelegateAdaptor`) to disable window state restoration
 - Files must be dropped onto the app window (not Finder or Dock icons)
-- App automatically quits 3 seconds after successful processing
+- App automatically quits 5 seconds after successful processing
 
 
 ## Building and Running
@@ -43,7 +47,7 @@
 
 - **removexattr()**: Removes extended attributes from files
 - **SwiftUI**: Modern declarative UI framework
-- **os.Logger**: Structured logging
+- **print()**: Basic console logging
 - **DispatchQueue**: Background processing
 
 ### Error Handling
@@ -57,12 +61,17 @@ The app provides user-friendly feedback through differentiated alerts:
   - Single file: "Successfully processed 1 file (quarantine attribute was not present)."
   - Multiple files: "Successfully processed N files (quarantine attribute was not present)."
 - **Mixed results**: Shows combined message with counts
-  - "Successfully processed N files (X removed, Y already cleaned)."
+  - "Successfully processed N files (com.apple.quarantine was present in X and absent in Y)."
 - **Error**: Alerts users when files cannot be modified due to permission restrictions
   - Single file: "Failed to remove quarantine attribute. The file may be in a protected location or require administrator privileges."
   - Multiple files: "Failed to remove quarantine attribute from N file(s). Some files may be in protected locations or require administrator privileges."
+- **Re-sign success**: Reports how many app bundles were re-signed
+  - No apps to re-sign: "Successfully processed N file(s). The dropped items contained no app bundles to re-sign."
+  - One app re-signed: "Successfully processed N file(s) and re-signed 1 app bundle."
+  - Multiple apps re-signed: "Successfully processed N file(s) and re-signed X app bundles."
+- **Re-sign failure**: "Quarantine was removed, but re-signing failed for N item(s)."
 
-After displaying a success alert, the app automatically quits after 3 seconds. Error alerts do not trigger auto-quit as they require user attention.
+After displaying a success alert, the app automatically quits after 5 seconds. Error alerts do not trigger auto-quit as they require user attention.
 
 ## Implementation
 
@@ -75,7 +84,7 @@ The app uses the `removexattr` system call to remove the `com.apple.quarantine` 
 - Returns structured result (success, notFound, permissionDenied, or otherError)
 - Handles ENOATTR as success (attribute absent)
 - Handles EPERM and EACCES (permission denied) gracefully with user feedback
-- Structured logging via `os.Logger`
+- Basic console logging via `print()`
 
 ```swift
 static func removeQuarantineAttribute(from url: URL) -> QuarantineRemovalResult {
@@ -84,7 +93,7 @@ static func removeQuarantineAttribute(from url: URL) -> QuarantineRemovalResult 
     // First verify the file exists
     let fileManager = FileManager.default
     guard fileManager.fileExists(atPath: path) else {
-        logger.error("File does not exist at path: \(path)")
+        print("File does not exist at path: \(path)")
         return .otherError("File not found")
     }
     
@@ -93,19 +102,19 @@ static func removeQuarantineAttribute(from url: URL) -> QuarantineRemovalResult 
     let result = removexattr(path, quarantineAttribute, XATTR_NOFOLLOW)
     
     if result == 0 {
-        logger.info("Successfully removed quarantine attribute from: \(path)")
+        print("Successfully removed quarantine attribute from: \(path)")
         return .success
     } else {
         let error = errno
         if error == ENOATTR {
-            logger.debug("Quarantine attribute not found on: \(path)")
+            print("Quarantine attribute not found on: \(path)")
             return .notFound
         } else if error == EPERM || error == EACCES {
-            logger.warning("Permission denied when removing quarantine attribute from \(path)")
+            print("Permission denied when removing quarantine attribute from \(path)")
             return .permissionDenied
         } else {
             let errorMsg = String(cString: strerror(error))
-            logger.error("Error removing quarantine attribute from \(path): \(errorMsg)")
+            print("Error removing quarantine attribute from \(path): \(errorMsg)")
             return .otherError(errorMsg)
         }
     }
@@ -119,16 +128,18 @@ static func removeQuarantineAttribute(from url: URL) -> QuarantineRemovalResult 
 - Visual feedback on drag-over
 - User alerts showing differentiated success/failure messages
 - Batch processing with `DispatchGroup` for coordinated completion
-- Auto-quit 3 seconds after successful processing
+- Auto-quit 5 seconds after successful processing
 
 **File Processing** (`FileProcessor.swift`)
 
-- Tracks three categories of results:
+- Tracks five categories of results:
   - `removedCount`: Files where quarantine attribute was successfully removed
   - `notFoundCount`: Files where quarantine attribute was not present
-  - `failedCount`: Files that could not be processed due to errors
+  - `xattrFailedCount`: Files that could not be processed due to xattr errors
+  - `reSignSuccessCount`: App bundles successfully re-signed
+  - `reSignFailedCount`: App bundles where re-signing failed
 - Displays context-appropriate alert messages based on result counts
-- Schedules automatic app termination 3 seconds after success alert
+- Schedules automatic app termination 5 seconds after success alert
 - Errors do not trigger auto-quit (requires user acknowledgment)
 
 **Configuration**
@@ -155,23 +166,32 @@ Since this app only performs a specific, well-defined operation (removing the qu
 ## File Structure
 
 ```
-Xattr-remove/
-├── README.md                          # User documentation
-├── Resources/
-│   ├── Project-structure.md           # Technical documentation
-│   ├── AppIcon.icns                   # App icon
-│   └── *.png                          # Screenshots and assets
-├── .gitignore                         # Git ignore patterns
-├── Xattr-remove.xcodeproj/
-│   └── project.pbxproj                # Xcode project configuration
-└── Xattr-remove/                      # Main application bundle
-    ├── Xattr_removeApp.swift          # App entry point (@main)
+Xattr-remove-2/
+├── README.md                              # User documentation (English)
+├── README-ES.md                           # User documentation (Spanish)
+├── CLAUDE.md                              # Technical reference for contributors
+├── appcast.xml                            # Sparkle update feed
+├── Images/                                # Screenshots used in READMEs
+├── DOCS/                                  # Extended technical documentation
+├── Xattr-remove.xcodeproj/               # Xcode project configuration
+└── Xattr-remove/                          # Main application source
+    ├── Xattr_removeApp.swift              # App entry point (@main)
+    ├── UpdateController.swift             # Sparkle updater wrapper
+    ├── Info.plist                         # App configuration
+    ├── Xattr_remove.entitlements          # Security entitlements (sandbox disabled)
+    ├── Assets.xcassets/                   # App assets
+    ├── Sparkle.xcframework/               # Sparkle framework (embedded, not via SPM)
     ├── Views/
-    │   └── ContentView.swift          # Main UI with drag-and-drop
+    │   ├── ContentView.swift              # Main UI with drag-and-drop and re-sign checkbox
+    │   └── CustomAlertView.swift          # Sheet-based custom alert
     ├── Model/
-    │   ├── FileProcessor.swift        # Processing coordination and alerts
-    │   └── XattrManager.swift         # Core xattr removal logic
-    ├── Info.plist                     # App configuration (droplet support)
-    ├── Xattr_remove.entitlements      # Security entitlements
-    └── Assets.xcassets/               # App assets
+    │   ├── FileProcessor.swift            # Processing coordination and alerts
+    │   └── XattrManager.swift             # Core xattr removal, re-sign, and architecture logic
+    └── Languages/
+        ├── LanguageSelectorView.swift     # Language picker sheet
+        ├── en.lproj/Localizable.strings
+        ├── es.lproj/Localizable.strings
+        ├── de.lproj/Localizable.strings
+        ├── fr.lproj/Localizable.strings
+        └── it.lproj/Localizable.strings
 ```

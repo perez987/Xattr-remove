@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import os.log
 
 // Result of removing a quarantine attribute
 enum QuarantineRemovalResult {
@@ -31,9 +30,6 @@ class XattrManager {
    /// XATTR_NOFOLLOW flag - don't follow symbolic links
     private static let XATTR_NOFOLLOW: Int32 = 0x0001
     
-    // Logger for xattr operations
-    private static let logger = Logger(subsystem: "com.xattr-rm.app", category: "XattrManager")
-
     // Returns a localized architecture description for .app bundles, executables, and libraries.
     // Returns nil when the dropped item is not a supported architecture candidate or cannot be resolved.
     static func architectureDescription(for url: URL) -> String? {
@@ -43,7 +39,7 @@ class XattrManager {
 
         let lipoPath = "/usr/bin/lipo"
         guard FileManager.default.fileExists(atPath: lipoPath) else {
-            logger.error("lipo not found at expected path: \(lipoPath)")
+            print("lipo not found at expected path: \(lipoPath)")
             return nil
         }
 
@@ -65,7 +61,7 @@ class XattrManager {
             let waitResult = exitSemaphore.wait(timeout: .now() + lipoTimeout)
             if waitResult == .timedOut {
                 process.terminate()
-                logger.error("Timed out while running lipo for path: \(architectureTargetURL.path)")
+                print("Timed out while running lipo for path: \(architectureTargetURL.path)")
                 return nil
             }
 
@@ -123,17 +119,17 @@ class XattrManager {
 
     private static func bundleExecutableURL(for bundleURL: URL) -> URL? {
         guard let bundle = Bundle(url: bundleURL) else {
-            logger.debug("Unable to open bundle for architecture lookup: \(bundleURL.path)")
+            print("Unable to open bundle for architecture lookup: \(bundleURL.path)")
             return nil
         }
 
         guard let executableURL = bundle.executableURL else {
-            logger.debug("Bundle has no executable for architecture lookup: \(bundleURL.path)")
+            print("Bundle has no executable for architecture lookup: \(bundleURL.path)")
             return nil
         }
 
         guard FileManager.default.fileExists(atPath: executableURL.path) else {
-            logger.debug("Bundle executable missing for architecture lookup: \(executableURL.path)")
+            print("Bundle executable missing for architecture lookup: \(executableURL.path)")
             return nil
         }
 
@@ -163,7 +159,7 @@ class XattrManager {
         // First verify the file exists
         let fileManager = FileManager.default
         guard fileManager.fileExists(atPath: path) else {
-            logger.error("File does not exist at path: \(path)")
+            print("File does not exist at path: \(path)")
             return .otherError("File not found")
         }
         
@@ -173,19 +169,19 @@ class XattrManager {
         let result = removexattr(path, quarantineAttribute, XATTR_NOFOLLOW)
         
         if result == 0 {
-            logger.info("Successfully removed quarantine attribute from: \(path)")
+            print("Successfully removed quarantine attribute from: \(path)")
             return .success
         } else {
             let error = errno
             if error == ENOATTR {
-                logger.debug("Quarantine attribute not found on: \(path)")
+                print("Quarantine attribute not found on: \(path)")
                 return .notFound
             } else if error == EPERM || error == EACCES {
-                logger.warning("Permission denied when removing quarantine attribute from \(path)")
+                print("Permission denied when removing quarantine attribute from \(path)")
                 return .permissionDenied
             } else {
                 let errorMsg = String(cString: strerror(error))
-                logger.error("Error removing quarantine attribute from \(path): \(errorMsg)")
+                print("Error removing quarantine attribute from \(path): \(errorMsg)")
                 return .otherError(errorMsg)
             }
         }
@@ -196,7 +192,7 @@ class XattrManager {
     // - Returns: Result of the re-sign operation
     static func reSignAppBundle(at appURL: URL) -> ReSignResult {
         guard appURL.pathExtension.lowercased() == "app" else {
-            logger.error("Re-signing requires a .app bundle: \(appURL.path)")
+            print("Re-signing requires a .app bundle: \(appURL.path)")
             return .failure("The dropped item is not an .app bundle.")
         }
 
@@ -206,23 +202,23 @@ class XattrManager {
             .path
 
         guard FileManager.default.fileExists(atPath: sparkleFrameworkPath) else {
-            logger.error("Sparkle.framework not found at expected path: \(sparkleFrameworkPath)")
+            print("Sparkle.framework not found at expected path: \(sparkleFrameworkPath)")
             return .failure("Sparkle.framework was not found inside the app bundle.")
         }
 
         let sparkleResult = runCodeSign(for: sparkleFrameworkPath)
         guard sparkleResult.success else {
-            logger.error("Failed to re-sign Sparkle.framework at \(sparkleFrameworkPath): \(sparkleResult.message)")
+            print("Failed to re-sign Sparkle.framework at \(sparkleFrameworkPath): \(sparkleResult.message)")
             return .failure(sparkleResult.message)
         }
 
         let appResult = runCodeSign(for: appPath)
         guard appResult.success else {
-            logger.error("Failed to re-sign app bundle at \(appPath): \(appResult.message)")
+            print("Failed to re-sign app bundle at \(appPath): \(appResult.message)")
             return .failure(appResult.message)
         }
 
-        logger.info("Successfully re-signed Sparkle.framework and app bundle at: \(appPath)")
+        print("Successfully re-signed Sparkle.framework and app bundle at: \(appPath)")
         return .success
     }
 

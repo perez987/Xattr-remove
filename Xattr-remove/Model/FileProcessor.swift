@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftUI
-import os.log
 
 // Groups all alert-related state into a single value so that
 // updating it triggers only one `objectWillChange` notification,
@@ -21,8 +20,6 @@ struct AlertState {
 class FileProcessor: ObservableObject {
     @Published var alertState = AlertState()
 
-    private let logger = Logger(subsystem: "com.xattr-rm.app", category: "FileProcessor")
-
     // Delay for displaying success alert before auto-quit
     private let alertDisplayDuration: TimeInterval = 5.0
     // Delay after dismissing alert before terminating app (needed for macOS Sonoma compatibility)
@@ -32,7 +29,7 @@ class FileProcessor: ObservableObject {
     func processFiles(_ urls: [URL], shouldResign: Bool = false, architectureInfo: String? = nil) {
         guard !urls.isEmpty else { return }
 
-        logger.info("Processing \(urls.count) file(s)")
+        print("Processing \(urls.count) file(s)")
 
         let group = DispatchGroup()
         let queue = DispatchQueue(label: "com.xattr-rm.file-processing")
@@ -85,7 +82,7 @@ class FileProcessor: ObservableObject {
 
         // Show result alert after all files are processed
         group.notify(queue: queue) {
-            self.logger.info("Processing complete: \(removedCount) removed, \(notFoundCount) not found, \(xattrFailedCount) xattr failed, \(reSignSuccessCount) re-signed, \(reSignFailedCount) re-sign failed")
+            print("Processing complete: \(removedCount) removed, \(notFoundCount) not found, \(xattrFailedCount) xattr failed, \(reSignSuccessCount) re-signed, \(reSignFailedCount) re-sign failed")
 
             // Capture the final counts before entering @MainActor context to avoid concurrency issues
             let finalRemovedCount = removedCount

@@ -7,7 +7,6 @@
 
 import SwiftUI
 import UniformTypeIdentifiers
-import os.log
 
 struct ContentView: View {
     @State private var isTargeted = false
@@ -18,9 +17,6 @@ struct ContentView: View {
     @State private var architectureInfoText: String?
     @State private var latestDropID = UUID()
     @EnvironmentObject var fileProcessor: FileProcessor
-    
-    // Logger for UI events
-    private let logger = Logger(subsystem: "com.xattr-rm.app", category: "ContentView")
     
     var body: some View {
         VStack(spacing: 20) {
@@ -101,7 +97,7 @@ struct ContentView: View {
                 guard let data = item as? Data,
                       let url = URL(dataRepresentation: data, relativeTo: nil) else {
                     if let error = error {
-                        self.logger.error("Error loading dropped item: \(error.localizedDescription)")
+                        print("Error loading dropped item: \(error.localizedDescription)")
                     }
                     group.leave()
                     return

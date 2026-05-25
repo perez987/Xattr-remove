@@ -154,10 +154,10 @@ Language selection is persisted in `UserDefaults` (`AppleLanguages` key). A rest
 
 ## Console Logs
 
-| Subsystem | Category | Notes |
-|---|---|---|
-| `com.xattr-rm.app` | `ContentView` | Drag-and-drop events |
-| `com.xattr-rm.app` | `XattrManager` | Per-file xattr results |
-| `com.xattr-rm.app` | `FileProcessor` | Batch start/completion summary |
+The app writes its operational logs directly with `print()` from:
+
+- `ContentView` (drag-and-drop loading errors)
+- `XattrManager` (per-file xattr and re-sign results)
+- `FileProcessor` (batch start/completion summary)
 
 Reentrant drag IPC messages (e.g., `kDragIPCCompleted`) are macOS system messages and cannot be suppressed.
