@@ -15,7 +15,6 @@ Xattr-remove-2/
 ├── CLAUDE.md                              # This file
 ├── README.md                              # User-facing English documentation
 ├── README-ES.md                           # User-facing Spanish documentation
-├── appcast.xml                            # Sparkle update feed
 ├── Images/                                # Screenshots and app icons used in READMEs
 ├── DOCS/
 │   ├── Project-structure.md               # Technical architecture docs
@@ -25,11 +24,9 @@ Xattr-remove-2/
 ├── Xattr-remove.xcodeproj/                # Xcode project (open this to build)
 └── Xattr-remove/                          # Main app source
     ├── Xattr_removeApp.swift              # @main entry point; sets up WindowGroup, menus, Sparkle
-    ├── UpdateController.swift             # Thin Sparkle wrapper (ObservableObject)
     ├── Info.plist                         # App configuration
     ├── Xattr_remove.entitlements          # Sandboxing DISABLED (required for removexattr)
     ├── Assets.xcassets/                   # App icons and accent color
-    ├── Sparkle.xcframework/               # Sparkle framework (embedded directly, not via SPM)
     ├── Views/
     │   ├── ContentView.swift              # Drag-and-drop UI; delegates to FileProcessor
     │   └── CustomAlertView.swift          # Sheet-based alert (avoids icon shown by SwiftUI alerts)
@@ -97,9 +94,7 @@ All counter increments (`removedCount`, `notFoundCount`, `xattrFailedCount`, `re
 1. Open `Xattr-remove.xcodeproj` in Xcode (14.0+)
 2. Select the **Xattr-remove** scheme
 3. **⌘B** to build, **⌘R** to run
-4. No external setup needed; Sparkle is embedded as `Sparkle.xcframework` and requires no additional package resolution
-
-There is **no command-line build path** (no `Makefile`, no `xcodebuild` scripts). Always build through Xcode.
+4. No external setup needed
 
 ## Testing
 
@@ -133,13 +128,6 @@ When adding a new UI string:
 2. Reference it via `NSLocalizedString("key", comment: "...")`
 
 Language selection is persisted in `UserDefaults` (`AppleLanguages` key). A restart is required to apply a new language.
-
-## Sparkle (Auto-Updates)
-
-- Integrated via embedded framework (`Sparkle 2.9.2`) — `Sparkle.xcframework` is checked in directly under `Xattr-remove/`
-- `UpdateController.swift` wraps `SPUStandardUpdaterController`
-- Menu item: **⌘U** ("Check for Updates…") — enabled only when `canCheckForUpdates` is `true`
-- Update feed: `appcast.xml` at the repository root
 
 ## Key Design Decisions
 

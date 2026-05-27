@@ -47,8 +47,6 @@ If the file dragged onto the window is an .app, a macOS executable or a library,
 - Supports all file types including apps and executables
 - Localization system with language selector and 5 languages (German, English, French, Italian and Spanish)
 - Language selector: `Language` > `Select language` in menubar or `⌘ + L` keyboard shortcut 
-- Integrate Sparkle auto-updates (add Sparkle via SwiftPM)
-- Add a `Check for Updates menu` (`⌘ + U`)
 
 ## Building
 
