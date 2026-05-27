@@ -9,9 +9,9 @@
 "remove_quarantine_subtitle" = "per rimuovere com.apple.quarantine";
 "resign_after_processing_option" = "   Rifirma app e Sparkle";
 "architecture_label_format" = "Architettura: %@";
-"architecture_intel_silicon" = "Intel e Silicon";
-"architecture_intel_only" = "Solo Intel";
-"architecture_silicon_only" = "Solo Silicon";
+"architecture_intel_silicon" = "Intel (x86_64) e Silicon (arm64)";
+"architecture_intel_only" = "Solo Intel (x86_64) ";
+"architecture_silicon_only" = "Solo Silicon (arm64)";
 "architecture_other_format" = "Altra (%@)";
 "architecture_accessibility_label_format" = "Informazioni sull'architettura binaria: %@";
 "ok_button" = "OK";
