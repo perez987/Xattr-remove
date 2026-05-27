@@ -32,9 +32,5 @@
 	<false/>
 	<key>NSApplicationSupportsSecureRestorableState</key>
 	<true/>
-	<key>SUFeedURL</key>
-	<string>https://raw.githubusercontent.com/perez987/Xattr-remove/main/appcast.xml</string>
-	<key>SUPublicEDKey</key>
-	<string>ZlKWZcBX5/V65EwhgJe0G+veSzYUiYrpJZL9dLE8vjw=</string>
 </dict>
 </plist>
