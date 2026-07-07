@@ -2,7 +2,7 @@
 
 ![Platform](https://img.shields.io/badge/macOS-13.5+-orange.svg)
 ![Swift](https://img.shields.io/badge/Swift-5+-green.svg)
-![Xcode](https://img.shields.io/badge/Xcode-14-lavender.svg)
+![Xcode](https://img.shields.io/badge/Xcode-15-lavender.svg)
 
 <a href="README.md">
     <img src="https://img.shields.io/badge/README-Inglés-blue" alt=“README inglés”>
@@ -68,7 +68,7 @@ Abre `Xattr-remove.xcodeproj` en Xcode y compila el proyecto. La aplicación req
 ## Requisitos
 
 - macOS 13.0 o posterior
-- Xcode 14.0 o posterior.
+- Xcode 15.0 o posterior.
 
 ## Primera ejecución
 
