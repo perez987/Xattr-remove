@@ -2,11 +2,7 @@
 
 ![Platform](https://img.shields.io/badge/macOS-13.5+-orange.svg)
 ![Swift](https://img.shields.io/badge/Swift-5+-green.svg)
-![Xcode](https://img.shields.io/badge/Xcode-15-lavender.svg)
-
-<a href="README-ES.md">
-    <img src="https://img.shields.io/badge/Spanish-README-blue" alt=“Spanish README”>
-</a><br><br>
+![Xcode](https://img.shields.io/badge/Xcode-15-blue.svg)
 
 SwiftUI application for macOS that removes `com.apple.quarantine` extended attribute from files downloaded from the Internet. Works by accepting files via drag and drop onto the app window.
 
@@ -16,7 +12,9 @@ This app is a simpler and lighter version of [Xattr Editor](https://github.com/p
 
 ### Digital re-sign (optional)
 
-You can also optionally digitally self-sign *ad-hoc* an app (and the Sparkle framework) by replacing its certificate. This is especially useful if, trying to run the app for the first time, even after removing the `com.apple.quarantine` attribute, the app crashes with a Sparkle-related error. This option is equivalent to running these commands:
+You can also optionally digitally self-sign *ad-hoc* an app (and the Sparkle framework) by replacing its certificate.
+This is especially useful if, trying to run an app for the first time, even after removing the `com.apple.quarantine` attribute, the app crashes with a Sparkle-related error.
+This option is equivalent to running these commands:
 
 ```bash
  codesign --force --deep --sign - \
@@ -39,6 +37,7 @@ If the file dragged onto the window is an .app, a macOS executable or a library,
 
 ## Features
 
+- Xattr-remove is certified by Apple (no Gatekeeper impediments at first run)
 - Drop files onto the app window to remove the quarantine attribute
 - Optional checkbox to re-sign app bundles (Sparkle first, app second) after removing the `quarantine` attribute
 - Information about detected architectures if it is a macOS binary file
@@ -61,14 +60,14 @@ Open `Xattr-remove.xcodeproj` in Xcode and build the project. The app requires m
 5. The user gets an alert as feedback
 6. The app automatically quits 5 seconds after displaying a success alert
 
-**Note:** Files must be dropped onto the app window. Dropping files onto the app icon in Finder or Dock is not supported due to macOS Gatekeeper restrictions with quarantined executables.
+**Note:** Files must be dropped onto the app window. Dropping files onto the app icon in Finder or Dock is hard to implement due to macOS Gatekeeper restrictions with quarantined executables.
 
 ## Requirements
 
 - macOS 13.0 or later
 - Xcode 15.0 or later (for building)
 
-## First run
+<!-- ## First run
 
 Xattr-remove, since it's also an app downloaded from the Internet, it also displays the Gatekeeper warning on the first run. This is unavoidable since the app is only ad-hoc signed and not notarized.
 </br>
@@ -79,7 +78,7 @@ To remove the quarantine attribute from Xattr-remove.app:
 - drag and drop Xattr-remove.app onto the Terminal window
 - ENTER.
 
-This doesn't happen if you download the source code, compile the app using Xcode, and save the product for regular use.
+This doesn't happen if you download the source code, compile the app using Xcode, and save the product for regular use. -->
 
 ## Credits
 
