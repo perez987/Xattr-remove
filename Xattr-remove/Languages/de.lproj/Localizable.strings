@@ -27,14 +27,14 @@
 "error_resign_failed_multiple" = "Quarantäne wurde entfernt, aber die Neusignierung ist bei %d Element(en) fehlgeschlagen.";
 
 /* Success Messages */
-"success_removed_single" = "Quarantäne-Attribut erfolgreich von der Datei entfernt.";
-"success_removed_multiple" = "Quarantäne-Attribut erfolgreich von %d Dateien entfernt.";
-"success_not_present_single" = "1 Datei erfolgreich verarbeitet (Quarantäne-Attribut war nicht vorhanden).";
-"success_not_present_multiple" = "%d Dateien erfolgreich verarbeitet (Quarantäne-Attribut war nicht vorhanden).";
-"success_mixed" = "%d Dateien erfolgreich verarbeitet (com.apple.quarantine war in %d vorhanden und in %d nicht vorhanden).";
-"success_resigned_none" = "%d Datei(en) erfolgreich verarbeitet. Es mussten keine App-Bundles neu signiert werden.";
-"success_resigned_single" = "%d Datei(en) erfolgreich verarbeitet und 1 App-Bundle neu signiert.";
-"success_resigned_multiple" = "%d Datei(en) erfolgreich verarbeitet und %d App-Bundles neu signiert.";
+"success_removed_single" = "Quarantäne-Attribut erfolgreich von der Datei entfernt.\n\nDiese Nachricht und die App werden in 5 Sekunden automatisch geschlossen.";
+"success_removed_multiple" = "Quarantäne-Attribut erfolgreich von %d Dateien entfernt.\n\nDiese Nachricht und die App werden in 5 Sekunden automatisch geschlossen.";
+"success_not_present_single" = "1 Datei erfolgreich verarbeitet (Quarantäne-Attribut war nicht vorhanden).\n\nDiese Nachricht und die App werden in 5 Sekunden automatisch geschlossen.";
+"success_not_present_multiple" = "%d Dateien erfolgreich verarbeitet (Quarantäne-Attribut war nicht vorhanden).\n\nDiese Nachricht und die App werden in 5 Sekunden automatisch geschlossen.";
+"success_mixed" = "%d Dateien erfolgreich verarbeitet (com.apple.quarantine war in %d vorhanden und in %d nicht vorhanden).\n\nDiese Nachricht und die App werden in 5 Sekunden automatisch geschlossen.";
+"success_resigned_none" = "%d Datei(en) erfolgreich verarbeitet. Es mussten keine App-Bundles neu signiert werden.\n\nDiese Nachricht und die App werden in 5 Sekunden automatisch geschlossen.";
+"success_resigned_single" = "%d Datei(en) erfolgreich verarbeitet und 1 App-Bundle neu signiert.\n\nDiese Nachricht und die App werden in 5 Sekunden automatisch geschlossen.";
+"success_resigned_multiple" = "%d Datei(en) erfolgreich verarbeitet und %d App-Bundles neu signiert.\n\nDiese Nachricht und die App werden in 5 Sekunden automatisch geschlossen.";
 
 /* Language Menu */
 "menu_language" = "Sprache";

@@ -27,14 +27,14 @@
 "error_resign_failed_multiple" = "La quarantaine a été supprimée, mais la re-signature a échoué pour %d élément(s).";
 
 /* Success Messages */
-"success_removed_single" = "Supprimé avec succès l'attribut com.apple.quarantine du fichier.";
-"success_removed_multiple" = "Supprimé avec succès l'attribut com.apple.quarantine de %d fichiers.";
-"success_not_present_single" = "Traité avec succès 1 fichier (com.apple.quarantine n'était pas présent).";
-"success_not_present_multiple" = "Traités avec succès %d fichiers (com.apple.quarantine n'était pas présent).";
-"success_mixed" = "Traités avec succès %d fichiers (com.apple.quarantine était présent dans %d et absent dans %d).";
-"success_resigned_none" = "%d fichier(s) traité(s) avec succès. Aucun bundle app n'avait besoin d'être re-signé.";
-"success_resigned_single" = "%d fichier(s) traité(s) avec succès et 1 bundle app re-signé.";
-"success_resigned_multiple" = "%d fichier(s) traité(s) avec succès et %d bundles app re-signés.";
+"success_removed_single" = "Supprimé avec succès l'attribut com.apple.quarantine du fichier.\n\nCe message et l'application se fermeront automatiquement dans 5 secondes.";
+"success_removed_multiple" = "Supprimé avec succès l'attribut com.apple.quarantine de %d fichiers.\n\nCe message et l'application se fermeront automatiquement dans 5 secondes.";
+"success_not_present_single" = "Traité avec succès 1 fichier (com.apple.quarantine n'était pas présent).\n\nCe message et l'application se fermeront automatiquement dans 5 secondes.";
+"success_not_present_multiple" = "Traités avec succès %d fichiers (com.apple.quarantine n'était pas présent).\n\nCe message et l'application se fermeront automatiquement dans 5 secondes.";
+"success_mixed" = "Traités avec succès %d fichiers (com.apple.quarantine était présent dans %d et absent dans %d).\n\nCe message et l'application se fermeront automatiquement dans 5 secondes.";
+"success_resigned_none" = "%d fichier(s) traité(s) avec succès. Aucun bundle app n'avait besoin d'être re-signé.\n\nCe message et l'application se fermeront automatiquement dans 5 secondes.";
+"success_resigned_single" = "%d fichier(s) traité(s) avec succès et 1 bundle app re-signé.\n\nCe message et l'application se fermeront automatiquement dans 5 secondes.";
+"success_resigned_multiple" = "%d fichier(s) traité(s) avec succès et %d bundles app re-signés.\n\nCe message et l'application se fermeront automatiquement dans 5 secondes.";
 
 /* Language Menu */
 "menu_language" = "Langue";
