@@ -27,14 +27,14 @@
 "error_resign_failed_multiple" = "Quarantine was removed, but re-signing failed for %d item(s).";
 
 /* Success Messages */
-"success_removed_single" = "Successfully removed quarantine attribute from file.";
-"success_removed_multiple" = "Successfully removed quarantine attribute from %d files.";
-"success_not_present_single" = "Successfully processed 1 file (quarantine attribute was not present).";
-"success_not_present_multiple" = "Successfully processed %d files (quarantine attribute was not present).";
-"success_mixed" = "Successfully processed %d files (com.apple.quarantine was present in %d and absent in %d).";
-"success_resigned_none" = "Successfully processed %d file(s). The dropped items contained no app bundles to re-sign.";
-"success_resigned_single" = "Successfully processed %d file(s) and re-signed 1 app bundle.";
-"success_resigned_multiple" = "Successfully processed %d file(s) and re-signed %d app bundles.";
+"success_removed_single" = "Successfully removed quarantine attribute from file.\n\nThis message and the app will close automatically in 5 seconds.";
+"success_removed_multiple" = "Successfully removed quarantine attribute from %d files.\n\nThis message and the app will close automatically in 5 seconds.";
+"success_not_present_single" = "Successfully processed 1 file (quarantine attribute was not present).\n\nThis message and the app will close automatically in 5 seconds.";
+"success_not_present_multiple" = "Successfully processed %d files (quarantine attribute was not present).\n\nThis message and the app will close automatically in 5 seconds.";
+"success_mixed" = "Successfully processed %d files (com.apple.quarantine was present in %d and absent in %d).\n\nThis message and the app will close automatically in 5 seconds..";
+"success_resigned_none" = "Successfully processed %d file(s). The dropped items contained no app bundles to re-sign.\n\nThis message and the app will close automatically in 5 seconds.";
+"success_resigned_single" = "Successfully processed %d file(s) and re-signed 1 app bundle.\n\nThis message and the app will close automatically in 5 seconds.";
+"success_resigned_multiple" = "Successfully processed %d file(s) and re-signed %d app bundles.\n\nThis message and the app will close automatically in 5 seconds.";
 
 /* Language Menu */
 "menu_language" = "Language";

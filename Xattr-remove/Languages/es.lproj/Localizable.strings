@@ -27,14 +27,14 @@
 "error_resign_failed_multiple" = "Se eliminó la cuarentena, pero la nueva firma falló en %d elemento(s).";
 
 /* Success Messages */
-"success_removed_single" = "Se ha quitado com.apple.quarantine correctamente del archivo.";
-"success_removed_multiple" = "Se ha quitado com.apple.quarantine correctamente de %d archivos.";
-"success_not_present_single" = "Un archivo procesado correctamente (com.apple.quarantine no estaba presente).";
-"success_not_present_multiple" = "%d archivos procesados correctamente (com.apple.quarantine no estaba presente).";
-"success_mixed" = "%d archivos procesados correctamente (com.apple.quarantine estaba presente en %d y ausente en %d).";
-"success_resigned_none" = "%d archivo(s) procesado(s) correctamente. No hubo apps que volver a firmar.";
-"success_resigned_single" = "%d archivo(s) procesado(s) correctamente y 1 app volvió a firmarse.";
-"success_resigned_multiple" = "%d archivo(s) procesado(s) correctamente y %d apps volvieron a firmarse.";
+"success_removed_single" = "Se ha quitado com.apple.quarantine correctamente del archivo.\n\nEste mensaje y la app se cerrarán automáticamente en 5 segundos.";
+"success_removed_multiple" = "Se ha quitado com.apple.quarantine correctamente de %d archivos.\n\nEste mensaje y la app se cerrarán automáticamente en 5 segundos.";
+"success_not_present_single" = "Un archivo procesado correctamente (com.apple.quarantine no estaba presente).\n\nEste mensaje y la app se cerrarán automáticamente en 5 segundos.";
+"success_not_present_multiple" = "%d archivos procesados correctamente (com.apple.quarantine no estaba presente).\n\nEste mensaje y la app se cerrarán automáticamente en 5 segundos.";
+"success_mixed" = "%d archivos procesados correctamente (com.apple.quarantine estaba presente en %d y ausente en %d).\n\nEste mensaje y la app se cerrarán automáticamente en 5 segundos.";
+"success_resigned_none" = "%d archivo(s) procesado(s) correctamente. No hubo apps que volver a firmar.\n\nEste mensaje y la app se cerrarán automáticamente en 5 segundos.";
+"success_resigned_single" = "%d archivo(s) procesado(s) correctamente y 1 app volvió a firmarse.\n\nEste mensaje y la app se cerrarán automáticamente en 5 segundos.";
+"success_resigned_multiple" = "%d archivo(s) procesado(s) correctamente y %d apps volvieron a firmarse.\n\nEste mensaje y la app se cerrarán automáticamente en 5 segundos.";
 
 /* Language Menu */
 "menu_language" = "Idioma";
