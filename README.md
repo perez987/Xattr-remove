@@ -37,7 +37,7 @@ If the file dragged onto the window is an .app, a macOS executable or a library,
 
 ## Features
 
-- Xattr-remove is certified by Apple (no Gatekeeper impediments at first run)
+- Xattr-remove is certified by Apple and has no issues with Gatekeeper on first run
 - Drop files onto the app window to remove the quarantine attribute
 - Optional checkbox to re-sign app bundles (Sparkle first, app second) after removing the `quarantine` attribute
 - Information about detected architectures if it is a macOS binary file
