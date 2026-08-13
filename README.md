@@ -8,7 +8,7 @@ SwiftUI application for macOS that removes `com.apple.quarantine` extended attri
 
 ### Quarantine attribute removal
 
-This app is a simpler and lighter version of [Xattr Editor](https://github.com/perez987/Xattr-Editor). Instead of displaying and editing (removing, modifying, adding) extended attributes, it performs a single task: removing `com.apple.quarantine` in a quick way from files downloaded from the Internet so that they can be opened in macOS without Gatekeeper warnings.
+This app is a simpler and lighter version of [Xattr Editor](https://github.com/perez987/Xattr-Editor). Instead of displaying and editing (remove, modify, add) extended attributes, it performs a single task: remove `com.apple.quarantine` in a quick way from files downloaded from the Internet so that they can be opened in macOS without Gatekeeper issues.
 
 ### Digital re-sign (optional)
 
