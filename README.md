@@ -28,6 +28,8 @@ This option is equivalent to running these commands:
   <App-name>.app
 ```
 
+**Note**: This is not necessary or recommended for apps digitally signed with an Apple Developer ID..
+
 ### Architecture detection
 
 If the file dragged onto the window is an .app, a macOS executable or a library, Xattr-remove runs `lipo -archs` on the binary. The result (architecture/s of the file) is shown in the main window while processing, and appended to the success alert message. It can be `Intel and Silicon`, `Only Intel` or `Only Silicon`. For multiple-file drops, no architecture info is shown (it would be ambiguous). Non-binary files (plain documents, scripts, etc.) silently return nothing and no label appears.
