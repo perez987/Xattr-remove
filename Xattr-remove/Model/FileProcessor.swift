@@ -96,10 +96,14 @@ class FileProcessor: ObservableObject {
             DispatchQueue.main.asyncAfter(deadline: .now()) { [self] in
                 var newState = AlertState()
 
-                if finalXattrFailedCount > 0 || finalReSignFailedCount > 0 {
+                // Re-sign-only errors (xattr succeeded) are treated like successes for auto-quit
+                let hasXattrError = finalXattrFailedCount > 0
+                let hasReSignError = finalReSignFailedCount > 0
+
+                if hasXattrError || hasReSignError {
                     newState.title = NSLocalizedString("error_title", comment: "Error alert title")
 
-                    if finalReSignFailedCount > 0 && finalXattrFailedCount == 0 {
+                    if hasReSignError && !hasXattrError {
                         if finalReSignFailedCount == 1 {
                             newState.message = NSLocalizedString("error_resign_failed_single", comment: "Error message for one re-sign failure")
                         } else {
@@ -119,6 +123,18 @@ class FileProcessor: ObservableObject {
                     appendArchitectureInfo(architectureInfo, to: &newState)
                     newState.isPresented = true
                     self.alertState = newState
+
+                    // Auto-quit after display duration when the only errors are re-sign failures
+                    // (quarantine removal itself succeeded). True xattr errors keep the alert open
+                    // until the user dismisses it.
+                    if !hasXattrError {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + self.alertDisplayDuration) {
+                            NSApplication.shared.windows.forEach { $0.orderOut(nil) }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + self.alertDismissalDelay) {
+                                exit(0)
+                            }
+                        }
+                    }
                 } else if finalRemovedCount > 0 || finalNotFoundCount > 0 {
                     newState.title = NSLocalizedString("success_title", comment: "Success alert title")
 

@@ -10,65 +10,139 @@ import UniformTypeIdentifiers
 
 struct ContentView: View {
     @State private var isTargeted = false
-    // Re-sign option saved between runs
-//    @AppStorage("resign_after_processing") private var shouldResignAfterProcessing = false
-    //  Re-sign option always false at run
+    // Re-sign option always false at run
     @State private var shouldResignAfterProcessing = false
     @State private var architectureInfoText: String?
     @State private var latestDropID = UUID()
     @EnvironmentObject var fileProcessor: FileProcessor
-    
-    var body: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "arrow.up.trash")
-                .font(.system(size: 58))
-                .foregroundColor(isTargeted ? .blue : .gray)
-            
-            Text(NSLocalizedString("drop_file_here", comment: "Main UI text"))
-                .font(.title2)
-                .foregroundColor(.secondary)
-            
-            Text(NSLocalizedString("remove_quarantine_subtitle", comment: "Subtitle text"))
-                .font(.body)
-                .foregroundColor(.secondary)
-            
-            Divider()
 
-            Toggle(
-                NSLocalizedString("resign_after_processing_option", comment: "Option to re-sign dropped app bundles"),
-                isOn: $shouldResignAfterProcessing
+    // Subtle gradient that shifts slightly when a file is dragged over
+    private var backgroundGradient: LinearGradient {
+        if isTargeted {
+            return LinearGradient(
+                colors: [
+                    Color(red: 0.55, green: 0.78, blue: 1.0).opacity(0.35),
+                    Color(red: 0.70, green: 0.60, blue: 1.0).opacity(0.35)
+                ],
+                startPoint: .topLeading, endPoint: .bottomTrailing
             )
-//            .padding(.leading, 20)
-            .foregroundColor(.secondary)
-            .multilineTextAlignment(.leading)
-            .toggleStyle(.checkbox)
-            .frame(maxWidth: 240,)
-            
-            Divider()
+        } else {
+            return LinearGradient(
+                colors: [
+                    Color(red: 0.60, green: 0.82, blue: 1.0).opacity(0.18),
+                    Color(red: 0.75, green: 0.65, blue: 1.0).opacity(0.18)
+                ],
+                startPoint: .topLeading, endPoint: .bottomTrailing
+            )
+        }
+    }
 
-            if let architectureInfoText {
-                Text(architectureInfoText)
-                    .font(.body)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.leading)
-//                    .frame(maxWidth: 240, alignment: .leading)
-                    .accessibilityLabel(
-                        String.localizedStringWithFormat(
-                            NSLocalizedString("architecture_accessibility_label_format", comment: "Accessibility label for architecture info text"),
-                            architectureInfoText
+    var body: some View {
+        ZStack {
+            backgroundGradient
+                .ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                // Drop-target icon
+                ZStack {
+                    Circle()
+                        .fill(
+                            isTargeted
+                                ? Color.accentColor.opacity(0.22)
+                                : Color.white.opacity(0.15)
                         )
+                        .frame(width: 88, height: 88)
+                        .blur(radius: isTargeted ? 2 : 0)
+                        .animation(.easeInOut(duration: 0.2), value: isTargeted)
+
+                    Image(systemName: "arrow.up.trash")
+                        .font(.system(size: 42, weight: .light))
+                        .foregroundStyle(
+                            isTargeted
+                                ? AnyShapeStyle(Color.accentColor)
+                                : AnyShapeStyle(
+                                    LinearGradient(
+                                        colors: [
+                                            Color(red: 0.45, green: 0.65, blue: 1.0),
+                                            Color(red: 0.60, green: 0.45, blue: 0.95)
+                                        ],
+                                        startPoint: .topLeading, endPoint: .bottomTrailing
+                                    )
+                                )
+                        )
+                        .animation(.easeInOut(duration: 0.2), value: isTargeted)
+                }
+                .padding(.top, 28)
+
+                // Title
+                Text(NSLocalizedString("drop_file_here", comment: "Main UI text"))
+                    .font(.title.weight(.semibold))
+                    .foregroundColor(.primary.opacity(0.85))
+                    .padding(.top, 16)
+
+                // Subtitle
+                Text(NSLocalizedString("remove_quarantine_subtitle", comment: "Subtitle text"))
+                    .font(.body)
+                    .foregroundColor(.primary)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 4)
+                    .padding(.horizontal, 24)
+
+                // Glass-card divider area
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(.ultraThickMaterial)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .strokeBorder(Color.green.opacity(0.5), lineWidth: 1)
                     )
+                    .overlay(
+                        Toggle(
+                            NSLocalizedString("resign_after_processing_option", comment: "Option to re-sign dropped app bundles"),
+                            isOn: $shouldResignAfterProcessing
+                        )
+                        .toggleStyle(.checkbox)
+                        .foregroundColor(.primary)
+                        .multilineTextAlignment(.leading)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 16)
+                    )
+                    .frame(height: 54)
+                    .padding(.horizontal, 28)
+                    .padding(.top, 18)
+
+                // Architecture info (shown only for single-file drops)
+                if let architectureInfoText {
+                    Text(architectureInfoText)
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.top, 14)
+                        .accessibilityLabel(
+                            String.localizedStringWithFormat(
+                                NSLocalizedString("architecture_accessibility_label_format", comment: "Accessibility label for architecture info text"),
+                                architectureInfoText
+                            )
+                        )
+                } else {
+                    Spacer().frame(height: 14)
+                }
+
+                Spacer(minLength: 20)
             }
         }
         .frame(
-            minWidth: 360,
-            idealWidth: 360,
-            maxWidth: 360,
-            minHeight: 340,
-            idealHeight: 340,
-            maxHeight: 340
+            minWidth: 360, idealWidth: 360, maxWidth: 360,
+            minHeight: 340, idealHeight: 340, maxHeight: 340
         )
-        .background(isTargeted ? Color.blue.opacity(0.1) : Color.clear)
+        // Subtle ring when a file is dragged over
+        .overlay(
+            RoundedRectangle(cornerRadius: 0)
+                .strokeBorder(
+                    isTargeted ? Color.accentColor.opacity(0.55) : Color.clear,
+                    lineWidth: 2
+                )
+                .animation(.easeInOut(duration: 0.15), value: isTargeted)
+        )
         // Note: macOS may log reentrant drag IPC messages in Xcode console during drag operations.
         // These are system-level messages (e.g., "kDragIPCCompleted") and cannot be suppressed.
         .onDrop(of: [.fileURL], isTargeted: $isTargeted) { providers in

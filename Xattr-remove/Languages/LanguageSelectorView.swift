@@ -51,44 +51,82 @@ struct LanguageSelectorView: View {
     }
 
     var body: some View {
-        VStack(spacing: 20) {
-            Text(NSLocalizedString("language_selector_title", comment: "Language selector title"))
-                .font(.title2)
-                .padding(.top)
+        ZStack {
+            LinearGradient(
+                colors: [
+                    Color(red: 0.60, green: 0.82, blue: 1.0).opacity(0.18),
+                    Color(red: 0.75, green: 0.65, blue: 1.0).opacity(0.18)
+                ],
+                startPoint: .topLeading, endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
 
-            List(languages, selection: $selectedLanguage) { language in
-                HStack {
-                    Text(language.flag)
-                        .font(.title2)
-                    Text(language.name)
-                        .font(.body)
-                }
-                .tag(language.code)
-                .padding(.vertical, 4)
-            }
-            .frame(width: 222, height: 208)
-            .border(Color.gray.opacity(0.3), width: 1)
+            VStack(spacing: 0) {
+                // Header
+                Image(systemName: "globe")
+                    .padding(.top, 16)
+                    .font(.system(size: 26, weight: .medium))
+                    .foregroundStyle(.blue)
+ 
+                Text(NSLocalizedString("language_selector_title", comment: "Language selector title"))
+                    .font(.title3.weight(.semibold))
+                    .foregroundColor(.primary.opacity(0.85))
+                    .padding(.top, 10)
+                    .padding(.bottom, 14)
 
-            HStack(spacing: 12) {
-                Button(NSLocalizedString("cancel", comment: "Cancel button")) {
-                    dismiss()
-                }
-                .keyboardShortcut(.cancelAction)
+                // Language list inside a glass card
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(.ultraThinMaterial)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .strokeBorder(Color.green.opacity(0.35), lineWidth: 1)
+                            .shadow(color: .black.opacity(0.12), radius: 16, x: 0, y: 4)
+                    )
+                    .overlay(
+                        List(languages, selection: $selectedLanguage) { language in
+                            HStack(spacing: 10) {
+                                Text(language.flag)
+                                    .font(.title2)
+                                Text(language.name)
+                                    .font(.body)
+                                    .foregroundColor(.primary.opacity(0.85))
+                            }
+                            .tag(language.code)
+                            .padding(.vertical, 3)
+                            .listRowBackground(
+                                selectedLanguage == language.code
+                                    ? Color.accentColor.opacity(0.18)
+                                    : Color.clear
+                            )
+                        }
+                        .scrollContentBackground(.hidden)
+                        .clipShape(RoundedRectangle(cornerRadius: 13))
+                    )
+                    .frame(width: 234, height: 200)
+                    .padding(.horizontal, 20)
 
-                Button(NSLocalizedString("accept", comment: "Accept button")) {
-                    // Only show alert if language actually changed
-                    if hasLanguageChanged {
-                        saveLanguagePreference()
-                        showRestartAlert = true
-                    } else {
+                // Buttons
+                HStack(spacing: 12) {
+                    Button(NSLocalizedString("cancel", comment: "Cancel button")) {
                         dismiss()
                     }
+                    .keyboardShortcut(.cancelAction)
+
+                    Button(NSLocalizedString("accept", comment: "Accept button")) {
+                        if hasLanguageChanged {
+                            saveLanguagePreference()
+                            showRestartAlert = true
+                        } else {
+                            dismiss()
+                        }
+                    }
+                    .keyboardShortcut(.defaultAction)
+                    .buttonStyle(.borderedProminent)
                 }
-                .keyboardShortcut(.defaultAction)
+                .padding(.top, 16)
+                .padding(.bottom, 22)
             }
-            .padding(.bottom)
         }
-        .padding()
         .frame(width: 280)
         .alert(
             NSLocalizedString("language_changed_title", comment: "Language changed alert title"),
