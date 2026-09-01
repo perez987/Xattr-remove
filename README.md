@@ -4,7 +4,7 @@
 ![Swift](https://img.shields.io/badge/Swift-5+-green.svg)
 ![Xcode](https://img.shields.io/badge/Xcode-15-blue.svg)
 
-![Icon](Images/Xattricon-peq.png)
+![Icon](Images/XattrIcon-peq.png)
 
 SwiftUI application for macOS that removes `com.apple.quarantine` extended attribute from files downloaded from the Internet. Works by accepting files via drag and drop onto the app window.
 
