@@ -6,6 +6,10 @@
 
 SwiftUI application for macOS that removes `com.apple.quarantine` extended attribute from files downloaded from the Internet. Works by accepting files via drag and drop onto the app window.
 
+|  |
+|:----|
+| ![Main](Images/Main-window.png) |
+
 ### Quarantine attribute removal
 
 This app is a simpler and lighter version of [Xattr Editor](https://github.com/perez987/Xattr-Editor). Instead of displaying and editing (remove, modify, add) extended attributes, it performs a single task: remove `com.apple.quarantine` in a quick way from files downloaded from the Internet so that they can be opened in macOS without Gatekeeper issues.
@@ -30,10 +34,9 @@ If the file dragged onto the window is an .app, a macOS executable or a library,
 
 | Screenshots |
 |:----|
-| ![Main](Images/Main-window.png) |
-| ![Unquarantine](Images/6files-noapp.png) |
-| ![Architecture](Images/1file-architecture.png) |
-| ![Re-sign](Images/7files-1app.png) |
+| ![Unquarantine](Images/1file+arch.png) |
+| ![Architecture](Images/3files-quarantine.png) |
+| ![Re-sign](Images/4files-quarantine.png) |
 
 ## Features
 
