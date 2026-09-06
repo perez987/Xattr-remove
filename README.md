@@ -39,7 +39,6 @@ If the file dragged onto the window is an .app, a macOS executable or a library,
 | ![Alert](Images/1file+arch.png) |
 | ![Alert](Images/3files-quarantine.png) |
 | ![Alert](Images/4files-quarantine.png) |
-| ![Alert](Images/1file-resign.png) |
 
 ## Features
 
