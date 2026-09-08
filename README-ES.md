@@ -37,7 +37,7 @@ Si el archivo arrastrado a la ventana es una `.app`, un ejecutable de macOS o un
 | Capturas de pantalla |
 |:----|
 | ![Alert](Images/1file+arch-es.png) |
-| ![Alert](Images/1file.png) |
+| ![Alert](Images/1file-es.png) |
 
 ## Funcionalidades
 
