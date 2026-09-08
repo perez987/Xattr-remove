@@ -1,4 +1,4 @@
-# Xattr-remove: eliminar `com.apple.quarantine` y volver a firmar la aplicación (opcional)
+# Xattr-remove: eliminar `com.apple.quarantine`
 
 ![Platform](https://img.shields.io/badge/macOS-13.5+-orange.svg)
 ![Swift](https://img.shields.io/badge/Swift-5+-green.svg)
