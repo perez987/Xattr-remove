@@ -8,7 +8,7 @@ Aplicación SwiftUI para macOS que elimina el atributo extendido `com.apple.quar
 
 |  |
 |:----|
-| ![Main](Images/Main-window.png) |
+| ![Main](Images/Main-window-es.png) |
 
 ### Eliminación del atributo de cuarentena
 
@@ -36,9 +36,8 @@ Si el archivo arrastrado a la ventana es una `.app`, un ejecutable de macOS o un
 
 | Capturas de pantalla |
 |:----|
-| ![Alert](Images/1file+arch.png) |
-| ![Alert](Images/3files-quarantine.png) |
-| ![Alert](Images/4files-quarantine.png) |
+| ![Alert](Images/1file+arch-es.png) |
+| ![Alert](Images/1file.png) |
 
 ## Funcionalidades
 
