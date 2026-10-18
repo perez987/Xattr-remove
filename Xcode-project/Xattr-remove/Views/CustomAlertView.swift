@@ -13,14 +13,20 @@ struct CustomAlertView: View {
     let title: String
     let message: String
 
-    // Determine icon and tint from title content
+    /// Determine icon and tint from title content
     private var isError: Bool {
         title.localizedCaseInsensitiveContains("error") ||
-        title.localizedCaseInsensitiveContains("err") ||
-        title.localizedCaseInsensitiveContains("fail")
+            title.localizedCaseInsensitiveContains("err") ||
+            title.localizedCaseInsensitiveContains("fail")
     }
-    private var iconName: String { isError ? "exclamationmark.triangle.fill" : "checkmark.circle.fill" }
-    private var iconColor: Color { isError ? Color(red: 1.0, green: 0.45, blue: 0.35) : Color(red: 0.30, green: 0.80, blue: 0.55) }
+
+    private var iconName: String {
+        isError ? "exclamationmark.triangle.fill" : "checkmark.circle.fill"
+    }
+
+    private var iconColor: Color {
+        isError ? Color(red: 1.0, green: 0.45, blue: 0.35) : Color(red: 0.30, green: 0.80, blue: 0.55)
+    }
 
     var body: some View {
         ZStack {
@@ -28,7 +34,7 @@ struct CustomAlertView: View {
             LinearGradient(
                 colors: [
                     Color(red: 0.60, green: 0.7, blue: 0.8).opacity(0.22),
-                    Color(red: 0.8, green: 0.65, blue: 1.0).opacity(0.22)
+                    Color(red: 0.8, green: 0.65, blue: 1.0).opacity(0.22),
                 ],
                 startPoint: .topLeading, endPoint: .bottomTrailing
             )

@@ -16,13 +16,13 @@ struct ContentView: View {
     @State private var latestDropID = UUID()
     @EnvironmentObject var fileProcessor: FileProcessor
 
-    // Subtle gradient that shifts slightly when a file is dragged over
+    /// Subtle gradient that shifts slightly when a file is dragged over
     private var backgroundGradient: LinearGradient {
         if isTargeted {
             return LinearGradient(
                 colors: [
                     Color(red: 0.55, green: 0.78, blue: 1.0).opacity(0.35),
-                    Color(red: 0.70, green: 0.60, blue: 1.0).opacity(0.35)
+                    Color(red: 0.70, green: 0.60, blue: 1.0).opacity(0.35),
                 ],
                 startPoint: .topLeading, endPoint: .bottomTrailing
             )
@@ -30,7 +30,7 @@ struct ContentView: View {
             return LinearGradient(
                 colors: [
                     Color(red: 0.60, green: 0.82, blue: 1.0).opacity(0.18),
-                    Color(red: 0.75, green: 0.65, blue: 1.0).opacity(0.18)
+                    Color(red: 0.75, green: 0.65, blue: 1.0).opacity(0.18),
                 ],
                 startPoint: .topLeading, endPoint: .bottomTrailing
             )
@@ -64,7 +64,7 @@ struct ContentView: View {
                                     LinearGradient(
                                         colors: [
                                             Color(red: 0.45, green: 0.65, blue: 1.0),
-                                            Color(red: 0.60, green: 0.45, blue: 0.95)
+                                            Color(red: 0.60, green: 0.45, blue: 0.95),
                                         ],
                                         startPoint: .topLeading, endPoint: .bottomTrailing
                                     )
@@ -156,7 +156,7 @@ struct ContentView: View {
             )
         }
     }
-    
+
     private func handleDrop(providers: [NSItemProvider]) {
         let dropID = UUID()
         latestDropID = dropID
@@ -164,26 +164,27 @@ struct ContentView: View {
         let group = DispatchGroup()
         let queue = DispatchQueue(label: "com.xattr-rm.url-collection")
         var urls: [URL] = []
-        
+
         for provider in providers {
             group.enter()
-            provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { (item, error) in
+            provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { item, error in
                 guard let data = item as? Data,
-                      let url = URL(dataRepresentation: data, relativeTo: nil) else {
+                      let url = URL(dataRepresentation: data, relativeTo: nil)
+                else {
                     if let error = error {
                         print("Error loading dropped item: \(error.localizedDescription)")
                     }
                     group.leave()
                     return
                 }
-                
+
                 queue.async {
                     urls.append(url)
                     group.leave()
                 }
             }
         }
-        
+
         // Process all collected URLs after loading completes
         group.notify(queue: queue) {
             if urls.count == 1 {

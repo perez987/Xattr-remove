@@ -8,9 +8,9 @@
 import Foundation
 import SwiftUI
 
-// Groups all alert-related state into a single value so that
-// updating it triggers only one `objectWillChange` notification,
-// preventing "Publishing changes from within view updates" warnings.
+/// Groups all alert-related state into a single value so that
+/// updating it triggers only one `objectWillChange` notification,
+/// preventing "Publishing changes from within view updates" warnings.
 struct AlertState {
     var isPresented = false
     var title = ""
@@ -20,12 +20,12 @@ struct AlertState {
 class FileProcessor: ObservableObject {
     @Published var alertState = AlertState()
 
-    // Delay for displaying success alert before auto-quit
+    /// Delay for displaying success alert before auto-quit
     private let alertDisplayDuration: TimeInterval = 5.0
-    // Delay after dismissing alert before terminating app (needed for macOS Sonoma compatibility)
+    /// Delay after dismissing alert before terminating app (needed for macOS Sonoma compatibility)
     private let alertDismissalDelay: TimeInterval = 0.2
 
-    // Process a list of file URLs
+    /// Process a list of file URLs
     func processFiles(_ urls: [URL], shouldResign: Bool = false, architectureInfo: String? = nil) {
         guard !urls.isEmpty else { return }
 
@@ -103,7 +103,7 @@ class FileProcessor: ObservableObject {
                 if hasXattrError || hasReSignError {
                     newState.title = NSLocalizedString("error_title", comment: "Error alert title")
 
-                    if hasReSignError && !hasXattrError {
+                    if hasReSignError, !hasXattrError {
                         if finalReSignFailedCount == 1 {
                             newState.message = NSLocalizedString("error_resign_failed_single", comment: "Error message for one re-sign failure")
                         } else {
@@ -112,7 +112,7 @@ class FileProcessor: ObservableObject {
                                 finalReSignFailedCount
                             )
                         }
-                    } else if finalXattrFailedCount == 1 && finalRemovedCount == 0 && finalNotFoundCount == 0 {
+                    } else if finalXattrFailedCount == 1, finalRemovedCount == 0, finalNotFoundCount == 0 {
                         newState.message = NSLocalizedString("error_single_file", comment: "Error message for single file")
                     } else {
                         newState.message = String.localizedStringWithFormat(
@@ -158,7 +158,7 @@ class FileProcessor: ObservableObject {
                         }
                     } else {
                         // Build appropriate message based on counts
-                        if finalRemovedCount > 0 && finalNotFoundCount == 0 {
+                        if finalRemovedCount > 0, finalNotFoundCount == 0 {
                             // Only removed files
                             if finalRemovedCount == 1 {
                                 newState.message = NSLocalizedString("success_removed_single", comment: "Success message for single removed file")
@@ -168,7 +168,7 @@ class FileProcessor: ObservableObject {
                                     finalRemovedCount
                                 )
                             }
-                        } else if finalRemovedCount == 0 && finalNotFoundCount > 0 {
+                        } else if finalRemovedCount == 0, finalNotFoundCount > 0 {
                             // Only not found files
                             if finalNotFoundCount == 1 {
                                 newState.message = NSLocalizedString("success_not_present_single", comment: "Success message for single file without quarantine")

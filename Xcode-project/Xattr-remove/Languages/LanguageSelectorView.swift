@@ -14,7 +14,7 @@ struct LanguageItem: Identifiable {
     let flag: String
 
     init(code: String, name: String, flag: String) {
-        self.id = code
+        id = code
         self.code = code
         self.name = name
         self.flag = flag
@@ -27,13 +27,13 @@ struct LanguageSelectorView: View {
     @State private var showRestartAlert = false
     private let initialLanguage: String
 
-    // Available languages sorted by code
+    /// Available languages sorted by code
     private let languages: [LanguageItem] = [
         LanguageItem(code: "en", name: "English", flag: "🇬🇧"),
         LanguageItem(code: "es", name: "Español", flag: "🇪🇸"),
         LanguageItem(code: "de", name: "Deutsch", flag: "🇩🇪"),
         LanguageItem(code: "fr", name: "Français", flag: "🇫🇷"),
-        LanguageItem(code: "it", name: "Italiano", flag: "🇮🇹")
+        LanguageItem(code: "it", name: "Italiano", flag: "🇮🇹"),
     ]
 
     private var hasLanguageChanged: Bool {
@@ -55,7 +55,7 @@ struct LanguageSelectorView: View {
             LinearGradient(
                 colors: [
                     Color(red: 0.60, green: 0.82, blue: 1.0).opacity(0.18),
-                    Color(red: 0.75, green: 0.65, blue: 1.0).opacity(0.18)
+                    Color(red: 0.75, green: 0.65, blue: 1.0).opacity(0.18),
                 ],
                 startPoint: .topLeading, endPoint: .bottomTrailing
             )
@@ -67,7 +67,7 @@ struct LanguageSelectorView: View {
                     .padding(.top, 16)
                     .font(.system(size: 26, weight: .medium))
                     .foregroundStyle(.blue)
- 
+
                 Text(NSLocalizedString("language_selector_title", comment: "Language selector title"))
                     .font(.title3.weight(.semibold))
                     .foregroundColor(.primary.opacity(0.85))

@@ -7,7 +7,7 @@
 
 import Foundation
 
-// Result of removing a quarantine attribute
+/// Result of removing a quarantine attribute
 enum QuarantineRemovalResult {
     case success
     case notFound
@@ -26,12 +26,12 @@ class XattrManager {
     private static let lipoTimeout: DispatchTimeInterval = .seconds(5)
     private static let architectureBundleExtensions = Set(["app", "framework", "bundle"])
     private static let architectureLibraryExtensions = Set(["dylib", "so"])
-    
-   /// XATTR_NOFOLLOW flag - don't follow symbolic links
+
+    /// XATTR_NOFOLLOW flag - don't follow symbolic links
     private static let XATTR_NOFOLLOW: Int32 = 0x0001
-    
-    // Returns a localized architecture description for .app bundles, executables, and libraries.
-    // Returns nil when the dropped item is not a supported architecture candidate or cannot be resolved.
+
+    /// Returns a localized architecture description for .app bundles, executables, and libraries.
+    /// Returns nil when the dropped item is not a supported architecture candidate or cannot be resolved.
     static func architectureDescription(for url: URL) -> String? {
         guard let architectureTargetURL = architectureTargetURL(for: url) else {
             return nil
@@ -81,7 +81,7 @@ class XattrManager {
             let hasSilicon = tokens.contains { $0 == "arm64" || $0 == "arm64e" }
 
             let architectureValue: String
-            if hasIntel && hasSilicon {
+            if hasIntel, hasSilicon {
                 architectureValue = NSLocalizedString("architecture_intel_silicon", comment: "Architecture label value for universal binary")
             } else if hasIntel {
                 architectureValue = NSLocalizedString("architecture_intel_only", comment: "Architecture label value for Intel-only binary")
@@ -139,7 +139,8 @@ class XattrManager {
     private static func isArchitectureCandidateFile(_ url: URL) -> Bool {
         var isDirectory: ObjCBool = false
         guard FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory),
-              !isDirectory.boolValue else {
+              !isDirectory.boolValue
+        else {
             return false
         }
 
@@ -149,25 +150,25 @@ class XattrManager {
 
         return architectureLibraryExtensions.contains(url.pathExtension.lowercased())
     }
-    
-    // Removes the com.apple.quarantine extended attribute from a file
-    // - Parameter url: The URL of the file to process
-    // - Returns: The result of the removal operation
+
+    /// Removes the com.apple.quarantine extended attribute from a file
+    /// - Parameter url: The URL of the file to process
+    /// - Returns: The result of the removal operation
     static func removeQuarantineAttribute(from url: URL) -> QuarantineRemovalResult {
         let path = url.path
-        
+
         // First verify the file exists
         let fileManager = FileManager.default
         guard fileManager.fileExists(atPath: path) else {
             print("File does not exist at path: \(path)")
             return .otherError("File not found")
         }
-        
+
         // Attempt to remove the attribute using C API
         // removexattr is a system function, part of Darwin's C standard library
         // Use XATTR_NOFOLLOW to not follow symbolic links
         let result = removexattr(path, quarantineAttribute, XATTR_NOFOLLOW)
-        
+
         if result == 0 {
             print("Successfully removed quarantine attribute from: \(path)")
             return .success
@@ -187,9 +188,9 @@ class XattrManager {
         }
     }
 
-    // Re-signs Sparkle framework and app bundle in required order
-    // - Parameter appURL: URL of the app bundle to re-sign
-    // - Returns: Result of the re-sign operation
+    /// Re-signs Sparkle framework and app bundle in required order
+    /// - Parameter appURL: URL of the app bundle to re-sign
+    /// - Returns: Result of the re-sign operation
     static func reSignAppBundle(at appURL: URL) -> ReSignResult {
         guard appURL.pathExtension.lowercased() == "app" else {
             print("Re-signing requires a .app bundle: \(appURL.path)")

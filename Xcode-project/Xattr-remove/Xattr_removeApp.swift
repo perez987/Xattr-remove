@@ -1,5 +1,5 @@
 //
-//  Xattr_rmApp.swift
+//  Xattr_removeApp.swift
 //  Xattr-rm
 //
 //  Created to remove com.apple.quarantine extended attribute from files
@@ -22,7 +22,7 @@ struct Xattr_rmApp: App {
         }
         .windowResizability(.contentSize)
         .commands {
-            CommandGroup(replacing: .newItem) { }
+            CommandGroup(replacing: .newItem) {}
             CommandMenu(NSLocalizedString("menu_language", comment: "Language menu")) {
                 Button(NSLocalizedString("menu_select_language", comment: "Select Language menu item")) {
                     isLanguageSelectorPresented = true
