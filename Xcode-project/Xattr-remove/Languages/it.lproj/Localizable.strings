@@ -49,5 +49,14 @@
 /* Finder Service */
 "finder_service_label" = "Rimuovi attributo di quarantena";
 
-/* Sparkle updater */
-"Check for Updates..." = "Controlla gli Aggiornamenti...";
+/* Update Check */
+"Check for Updates…" = "Verifica aggiornamenti…";
+"UpdateAvailable" = "Aggiornamento disponibile";
+"UpdateAvailableInfo" = "APP %@ è ora disponibile. Vuoi scaricarlo?";
+"DownloadUpdate" = "Scarica aggiornamento";
+"UpdateLater" = "Più tardi";
+"UpToDate" = "Sei aggiornato!";
+"UpToDateInfo" = "APP %@ è la versione più recente.";
+"UpdateCheckError" = "Verifica aggiornamenti non riuscita";
+"UpdateCheckFailed" = "Impossibile recuperare le informazioni sull'aggiornamento.";
+"UpdateCheckNetworkError" = "Impossibile connettersi al server degli aggiornamenti. Controlla la tua connessione a Internet.";
