@@ -24,7 +24,8 @@ struct ContentView: View {
                     Color(red: 0.55, green: 0.78, blue: 1.0).opacity(0.35),
                     Color(red: 0.70, green: 0.60, blue: 1.0).opacity(0.35),
                 ],
-                startPoint: .topLeading, endPoint: .bottomTrailing
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
             )
         } else {
             return LinearGradient(
@@ -32,7 +33,8 @@ struct ContentView: View {
                     Color(red: 0.60, green: 0.82, blue: 1.0).opacity(0.18),
                     Color(red: 0.75, green: 0.65, blue: 1.0).opacity(0.18),
                 ],
-                startPoint: .topLeading, endPoint: .bottomTrailing
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
             )
         }
     }
@@ -63,10 +65,19 @@ struct ContentView: View {
                                 : AnyShapeStyle(
                                     LinearGradient(
                                         colors: [
-                                            Color(red: 0.45, green: 0.65, blue: 1.0),
-                                            Color(red: 0.60, green: 0.45, blue: 0.95),
+                                            Color(
+                                                red: 0.45,
+                                                green: 0.65,
+                                                blue: 1.0
+                                            ),
+                                            Color(
+                                                red: 0.60,
+                                                green: 0.45,
+                                                blue: 0.95
+                                            ),
                                         ],
-                                        startPoint: .topLeading, endPoint: .bottomTrailing
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
                                     )
                                 )
                         )
@@ -75,29 +86,42 @@ struct ContentView: View {
                 .padding(.top, 28)
 
                 // Title
-                Text(NSLocalizedString("drop_file_here", comment: "Main UI text"))
-                    .font(.title.weight(.semibold))
-                    .foregroundColor(.primary.opacity(0.85))
-                    .padding(.top, 16)
+                Text(
+                    NSLocalizedString("drop_file_here", comment: "Main UI text")
+                )
+                .font(.title.weight(.semibold))
+                .foregroundColor(.primary.opacity(0.85))
+                .padding(.top, 16)
 
                 // Subtitle
-                Text(NSLocalizedString("remove_quarantine_subtitle", comment: "Subtitle text"))
-                    .font(.body)
-                    .foregroundColor(.primary)
-                    .multilineTextAlignment(.center)
-                    .padding(.top, 4)
-                    .padding(.horizontal, 24)
+                Text(
+                    NSLocalizedString(
+                        "remove_quarantine_subtitle",
+                        comment: "Subtitle text"
+                    )
+                )
+                .font(.body)
+                .foregroundColor(.primary)
+                .multilineTextAlignment(.center)
+                .padding(.top, 4)
+                .padding(.horizontal, 24)
 
                 // Glass-card divider area
                 RoundedRectangle(cornerRadius: 14)
                     .fill(.ultraThickMaterial)
                     .overlay(
                         RoundedRectangle(cornerRadius: 14)
-                            .strokeBorder(Color.green.opacity(0.5), lineWidth: 1)
+                            .strokeBorder(
+                                Color.green.opacity(0.5),
+                                lineWidth: 1
+                            )
                     )
                     .overlay(
                         Toggle(
-                            NSLocalizedString("resign_after_processing_option", comment: "Option to re-sign dropped app bundles"),
+                            NSLocalizedString(
+                                "resign_after_processing_option",
+                                comment: "Option to re-sign dropped app bundles"
+                            ),
                             isOn: $shouldResignAfterProcessing
                         )
                         .toggleStyle(.checkbox)
@@ -119,7 +143,11 @@ struct ContentView: View {
                         .padding(.top, 14)
                         .accessibilityLabel(
                             String.localizedStringWithFormat(
-                                NSLocalizedString("architecture_accessibility_label_format", comment: "Accessibility label for architecture info text"),
+                                NSLocalizedString(
+                                    "architecture_accessibility_label_format",
+                                    comment:
+                                        "Accessibility label for architecture info text"
+                                ),
                                 architectureInfoText
                             )
                         )
@@ -131,8 +159,12 @@ struct ContentView: View {
             }
         }
         .frame(
-            minWidth: 360, idealWidth: 360, maxWidth: 360,
-            minHeight: 340, idealHeight: 340, maxHeight: 340
+            minWidth: 360,
+            idealWidth: 360,
+            maxWidth: 360,
+            minHeight: 340,
+            idealHeight: 340,
+            maxHeight: 340
         )
         // Subtle ring when a file is dragged over
         .overlay(
@@ -167,12 +199,17 @@ struct ContentView: View {
 
         for provider in providers {
             group.enter()
-            provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { item, error in
+            provider.loadItem(
+                forTypeIdentifier: UTType.fileURL.identifier,
+                options: nil
+            ) { item, error in
                 guard let data = item as? Data,
-                      let url = URL(dataRepresentation: data, relativeTo: nil)
+                    let url = URL(dataRepresentation: data, relativeTo: nil)
                 else {
                     if let error = error {
-                        print("Error loading dropped item: \(error.localizedDescription)")
+                        print(
+                            "Error loading dropped item: \(error.localizedDescription)"
+                        )
                     }
                     group.leave()
                     return
@@ -190,11 +227,15 @@ struct ContentView: View {
             if urls.count == 1 {
                 let droppedURL = urls[0]
                 DispatchQueue.global(qos: .userInitiated).async {
-                    let architectureLabel = XattrManager.architectureDescription(for: droppedURL)
+                    let architectureLabel =
+                        XattrManager.architectureDescription(for: droppedURL)
                     DispatchQueue.main.async {
                         guard self.latestDropID == dropID else { return }
                         self.architectureInfoText = architectureLabel
-                        self.processDroppedFiles(urls, architectureInfo: architectureLabel)
+                        self.processDroppedFiles(
+                            urls,
+                            architectureInfo: architectureLabel
+                        )
                     }
                 }
             } else {

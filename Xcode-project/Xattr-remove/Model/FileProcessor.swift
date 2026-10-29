@@ -26,7 +26,11 @@ class FileProcessor: ObservableObject {
     private let alertDismissalDelay: TimeInterval = 0.2
 
     /// Process a list of file URLs
-    func processFiles(_ urls: [URL], shouldResign: Bool = false, architectureInfo: String? = nil) {
+    func processFiles(
+        _ urls: [URL],
+        shouldResign: Bool = false,
+        architectureInfo: String? = nil
+    ) {
         guard !urls.isEmpty else { return }
 
         print("Processing \(urls.count) file(s)")
@@ -82,7 +86,9 @@ class FileProcessor: ObservableObject {
 
         // Show result alert after all files are processed
         group.notify(queue: queue) {
-            print("Processing complete: \(removedCount) removed, \(notFoundCount) not found, \(xattrFailedCount) xattr failed, \(reSignSuccessCount) re-signed, \(reSignFailedCount) re-sign failed")
+            print(
+                "Processing complete: \(removedCount) removed, \(notFoundCount) not found, \(xattrFailedCount) xattr failed, \(reSignSuccessCount) re-signed, \(reSignFailedCount) re-sign failed"
+            )
 
             // Capture the final counts before entering @MainActor context to avoid concurrency issues
             let finalRemovedCount = removedCount
@@ -90,7 +96,8 @@ class FileProcessor: ObservableObject {
             let finalXattrFailedCount = xattrFailedCount
             let finalReSignSuccessCount = reSignSuccessCount
             let finalReSignFailedCount = reSignFailedCount
-            let successfullyProcessedCount = finalRemovedCount + finalNotFoundCount
+            let successfullyProcessedCount =
+                finalRemovedCount + finalNotFoundCount
 
             // Build alert state locally then assign once to trigger a single objectWillChange
             DispatchQueue.main.asyncAfter(deadline: .now()) { [self] in
@@ -101,22 +108,40 @@ class FileProcessor: ObservableObject {
                 let hasReSignError = finalReSignFailedCount > 0
 
                 if hasXattrError || hasReSignError {
-                    newState.title = NSLocalizedString("error_title", comment: "Error alert title")
+                    newState.title = NSLocalizedString(
+                        "error_title",
+                        comment: "Error alert title"
+                    )
 
                     if hasReSignError, !hasXattrError {
                         if finalReSignFailedCount == 1 {
-                            newState.message = NSLocalizedString("error_resign_failed_single", comment: "Error message for one re-sign failure")
+                            newState.message = NSLocalizedString(
+                                "error_resign_failed_single",
+                                comment: "Error message for one re-sign failure"
+                            )
                         } else {
                             newState.message = String.localizedStringWithFormat(
-                                NSLocalizedString("error_resign_failed_multiple", comment: "Error message for re-sign failures"),
+                                NSLocalizedString(
+                                    "error_resign_failed_multiple",
+                                    comment:
+                                        "Error message for re-sign failures"
+                                ),
                                 finalReSignFailedCount
                             )
                         }
-                    } else if finalXattrFailedCount == 1, finalRemovedCount == 0, finalNotFoundCount == 0 {
-                        newState.message = NSLocalizedString("error_single_file", comment: "Error message for single file")
+                    } else if finalXattrFailedCount == 1,
+                        finalRemovedCount == 0, finalNotFoundCount == 0
+                    {
+                        newState.message = NSLocalizedString(
+                            "error_single_file",
+                            comment: "Error message for single file"
+                        )
                     } else {
                         newState.message = String.localizedStringWithFormat(
-                            NSLocalizedString("error_multiple_files", comment: "Error message for multiple files"),
+                            NSLocalizedString(
+                                "error_multiple_files",
+                                comment: "Error message for multiple files"
+                            ),
                             finalXattrFailedCount
                         )
                     }
@@ -128,30 +153,51 @@ class FileProcessor: ObservableObject {
                     // (quarantine removal itself succeeded). True xattr errors keep the alert open
                     // until the user dismisses it.
                     if !hasXattrError {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + self.alertDisplayDuration) {
-                            NSApplication.shared.windows.forEach { $0.orderOut(nil) }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + self.alertDismissalDelay) {
+                        DispatchQueue.main.asyncAfter(
+                            deadline: .now() + self.alertDisplayDuration
+                        ) {
+                            NSApplication.shared.windows.forEach {
+                                $0.orderOut(nil)
+                            }
+                            DispatchQueue.main.asyncAfter(
+                                deadline: .now() + self.alertDismissalDelay
+                            ) {
                                 exit(0)
                             }
                         }
                     }
                 } else if finalRemovedCount > 0 || finalNotFoundCount > 0 {
-                    newState.title = NSLocalizedString("success_title", comment: "Success alert title")
+                    newState.title = NSLocalizedString(
+                        "success_title",
+                        comment: "Success alert title"
+                    )
 
                     if shouldResign {
                         if finalReSignSuccessCount == 0 {
                             newState.message = String.localizedStringWithFormat(
-                                NSLocalizedString("success_resigned_none", comment: "Success message when no app bundle needed re-signing"),
+                                NSLocalizedString(
+                                    "success_resigned_none",
+                                    comment:
+                                        "Success message when no app bundle needed re-signing"
+                                ),
                                 successfullyProcessedCount
                             )
                         } else if finalReSignSuccessCount == 1 {
                             newState.message = String.localizedStringWithFormat(
-                                NSLocalizedString("success_resigned_single", comment: "Success message for one re-signed app"),
+                                NSLocalizedString(
+                                    "success_resigned_single",
+                                    comment:
+                                        "Success message for one re-signed app"
+                                ),
                                 successfullyProcessedCount
                             )
                         } else {
                             newState.message = String.localizedStringWithFormat(
-                                NSLocalizedString("success_resigned_multiple", comment: "Success message for multiple re-signed apps"),
+                                NSLocalizedString(
+                                    "success_resigned_multiple",
+                                    comment:
+                                        "Success message for multiple re-signed apps"
+                                ),
                                 successfullyProcessedCount,
                                 finalReSignSuccessCount
                             )
@@ -161,29 +207,53 @@ class FileProcessor: ObservableObject {
                         if finalRemovedCount > 0, finalNotFoundCount == 0 {
                             // Only removed files
                             if finalRemovedCount == 1 {
-                                newState.message = NSLocalizedString("success_removed_single", comment: "Success message for single removed file")
-                            } else {
-                                newState.message = String.localizedStringWithFormat(
-                                    NSLocalizedString("success_removed_multiple", comment: "Success message for multiple removed files"),
-                                    finalRemovedCount
+                                newState.message = NSLocalizedString(
+                                    "success_removed_single",
+                                    comment:
+                                        "Success message for single removed file"
                                 )
+                            } else {
+                                newState.message =
+                                    String.localizedStringWithFormat(
+                                        NSLocalizedString(
+                                            "success_removed_multiple",
+                                            comment:
+                                                "Success message for multiple removed files"
+                                        ),
+                                        finalRemovedCount
+                                    )
                             }
-                        } else if finalRemovedCount == 0, finalNotFoundCount > 0 {
+                        } else if finalRemovedCount == 0, finalNotFoundCount > 0
+                        {
                             // Only not found files
                             if finalNotFoundCount == 1 {
-                                newState.message = NSLocalizedString("success_not_present_single", comment: "Success message for single file without quarantine")
-                            } else {
-                                newState.message = String.localizedStringWithFormat(
-                                    NSLocalizedString("success_not_present_multiple", comment: "Success message for multiple files without quarantine"),
-                                    finalNotFoundCount
+                                newState.message = NSLocalizedString(
+                                    "success_not_present_single",
+                                    comment:
+                                        "Success message for single file without quarantine"
                                 )
+                            } else {
+                                newState.message =
+                                    String.localizedStringWithFormat(
+                                        NSLocalizedString(
+                                            "success_not_present_multiple",
+                                            comment:
+                                                "Success message for multiple files without quarantine"
+                                        ),
+                                        finalNotFoundCount
+                                    )
                             }
                         } else {
                             // Mixed results
                             let total = finalRemovedCount + finalNotFoundCount
                             newState.message = String.localizedStringWithFormat(
-                                NSLocalizedString("success_mixed", comment: "Success message for mixed results"),
-                                total, finalRemovedCount, finalNotFoundCount
+                                NSLocalizedString(
+                                    "success_mixed",
+                                    comment: "Success message for mixed results"
+                                ),
+                                total,
+                                finalRemovedCount,
+                                finalNotFoundCount
                             )
                         }
                     }
@@ -195,9 +265,15 @@ class FileProcessor: ObservableObject {
                     // Schedule app quit after display duration
                     // Hide windows first via orderOut (avoids SwiftUI binding teardown warnings),
                     // then exit cleanly without triggering SwiftUI view lifecycle
-                    DispatchQueue.main.asyncAfter(deadline: .now() + self.alertDisplayDuration) {
-                        NSApplication.shared.windows.forEach { $0.orderOut(nil) }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + self.alertDismissalDelay) {
+                    DispatchQueue.main.asyncAfter(
+                        deadline: .now() + self.alertDisplayDuration
+                    ) {
+                        NSApplication.shared.windows.forEach {
+                            $0.orderOut(nil)
+                        }
+                        DispatchQueue.main.asyncAfter(
+                            deadline: .now() + self.alertDismissalDelay
+                        ) {
                             exit(0)
                         }
                     }
@@ -206,7 +282,10 @@ class FileProcessor: ObservableObject {
         }
     }
 
-    private func appendArchitectureInfo(_ architectureInfo: String?, to alertState: inout AlertState) {
+    private func appendArchitectureInfo(
+        _ architectureInfo: String?,
+        to alertState: inout AlertState
+    ) {
         guard let architectureInfo, !architectureInfo.isEmpty else { return }
         alertState.message += "\n\n\(architectureInfo)"
     }

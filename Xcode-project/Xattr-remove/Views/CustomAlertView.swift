@@ -15,9 +15,9 @@ struct CustomAlertView: View {
 
     /// Determine icon and tint from title content
     private var isError: Bool {
-        title.localizedCaseInsensitiveContains("error") ||
-            title.localizedCaseInsensitiveContains("err") ||
-            title.localizedCaseInsensitiveContains("fail")
+        title.localizedCaseInsensitiveContains("error")
+            || title.localizedCaseInsensitiveContains("err")
+            || title.localizedCaseInsensitiveContains("fail")
     }
 
     private var iconName: String {
@@ -25,7 +25,9 @@ struct CustomAlertView: View {
     }
 
     private var iconColor: Color {
-        isError ? Color(red: 1.0, green: 0.45, blue: 0.35) : Color(red: 0.30, green: 0.80, blue: 0.55)
+        isError
+            ? Color(red: 1.0, green: 0.45, blue: 0.35)
+            : Color(red: 0.30, green: 0.80, blue: 0.55)
     }
 
     var body: some View {
@@ -36,7 +38,8 @@ struct CustomAlertView: View {
                     Color(red: 0.60, green: 0.7, blue: 0.8).opacity(0.22),
                     Color(red: 0.8, green: 0.65, blue: 1.0).opacity(0.22),
                 ],
-                startPoint: .topLeading, endPoint: .bottomTrailing
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
             )
             .ignoresSafeArea()
 
@@ -75,7 +78,10 @@ struct CustomAlertView: View {
             }
             .padding(28)
             .frame(minWidth: 200, maxWidth: 200)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18))
+            .background(
+                .ultraThinMaterial,
+                in: RoundedRectangle(cornerRadius: 18)
+            )
             .overlay(
                 RoundedRectangle(cornerRadius: 18)
                     .strokeBorder(Color.white.opacity(0.5), lineWidth: 1)
@@ -91,7 +97,13 @@ struct CustomAlertView: View {
 
 #Preview {
     CustomAlertView(
-        title: NSLocalizedString("success_title", comment: "Success alert title"),
-        message: NSLocalizedString("success_removed_single", comment: "Success message for single removed file")
+        title: NSLocalizedString(
+            "success_title",
+            comment: "Success alert title"
+        ),
+        message: NSLocalizedString(
+            "success_removed_single",
+            comment: "Success message for single removed file"
+        )
     )
 }

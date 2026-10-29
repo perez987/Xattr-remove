@@ -24,7 +24,9 @@ class XattrManager {
     // The quarantine attribute name
     private static let quarantineAttribute = "com.apple.quarantine"
     private static let lipoTimeout: DispatchTimeInterval = .seconds(5)
-    private static let architectureBundleExtensions = Set(["app", "framework", "bundle"])
+    private static let architectureBundleExtensions = Set([
+        "app", "framework", "bundle",
+    ])
     private static let architectureLibraryExtensions = Set(["dylib", "so"])
 
     /// XATTR_NOFOLLOW flag - don't follow symbolic links
@@ -61,7 +63,9 @@ class XattrManager {
             let waitResult = exitSemaphore.wait(timeout: .now() + lipoTimeout)
             if waitResult == .timedOut {
                 process.terminate()
-                print("Timed out while running lipo for path: \(architectureTargetURL.path)")
+                print(
+                    "Timed out while running lipo for path: \(architectureTargetURL.path)"
+                )
                 return nil
             }
 
@@ -70,10 +74,12 @@ class XattrManager {
             }
 
             let data = outputPipe.fileHandleForReading.readDataToEndOfFile()
-            let rawOutput = String(data: data, encoding: .utf8)?
+            let rawOutput =
+                String(data: data, encoding: .utf8)?
                 .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
 
-            let tokens = rawOutput
+            let tokens =
+                rawOutput
                 .components(separatedBy: .whitespacesAndNewlines)
                 .filter { !$0.isEmpty }
 
@@ -82,14 +88,28 @@ class XattrManager {
 
             let architectureValue: String
             if hasIntel, hasSilicon {
-                architectureValue = NSLocalizedString("architecture_intel_silicon", comment: "Architecture label value for universal binary")
+                architectureValue = NSLocalizedString(
+                    "architecture_intel_silicon",
+                    comment: "Architecture label value for universal binary"
+                )
             } else if hasIntel {
-                architectureValue = NSLocalizedString("architecture_intel_only", comment: "Architecture label value for Intel-only binary")
+                architectureValue = NSLocalizedString(
+                    "architecture_intel_only",
+                    comment: "Architecture label value for Intel-only binary"
+                )
             } else if hasSilicon {
-                architectureValue = NSLocalizedString("architecture_silicon_only", comment: "Architecture label value for Apple Silicon-only binary")
+                architectureValue = NSLocalizedString(
+                    "architecture_silicon_only",
+                    comment:
+                        "Architecture label value for Apple Silicon-only binary"
+                )
             } else if !tokens.isEmpty {
                 architectureValue = String.localizedStringWithFormat(
-                    NSLocalizedString("architecture_other_format", comment: "Architecture label value for other/unknown architectures"),
+                    NSLocalizedString(
+                        "architecture_other_format",
+                        comment:
+                            "Architecture label value for other/unknown architectures"
+                    ),
                     tokens.joined(separator: ", ")
                 )
             } else {
@@ -97,7 +117,10 @@ class XattrManager {
             }
 
             return String.localizedStringWithFormat(
-                NSLocalizedString("architecture_label_format", comment: "Architecture info label format"),
+                NSLocalizedString(
+                    "architecture_label_format",
+                    comment: "Architecture info label format"
+                ),
                 architectureValue
             )
         } catch {
@@ -106,7 +129,8 @@ class XattrManager {
     }
 
     private static func architectureTargetURL(for url: URL) -> URL? {
-        if architectureBundleExtensions.contains(url.pathExtension.lowercased()) {
+        if architectureBundleExtensions.contains(url.pathExtension.lowercased())
+        {
             return bundleExecutableURL(for: url)
         }
 
@@ -119,17 +143,23 @@ class XattrManager {
 
     private static func bundleExecutableURL(for bundleURL: URL) -> URL? {
         guard let bundle = Bundle(url: bundleURL) else {
-            print("Unable to open bundle for architecture lookup: \(bundleURL.path)")
+            print(
+                "Unable to open bundle for architecture lookup: \(bundleURL.path)"
+            )
             return nil
         }
 
         guard let executableURL = bundle.executableURL else {
-            print("Bundle has no executable for architecture lookup: \(bundleURL.path)")
+            print(
+                "Bundle has no executable for architecture lookup: \(bundleURL.path)"
+            )
             return nil
         }
 
         guard FileManager.default.fileExists(atPath: executableURL.path) else {
-            print("Bundle executable missing for architecture lookup: \(executableURL.path)")
+            print(
+                "Bundle executable missing for architecture lookup: \(executableURL.path)"
+            )
             return nil
         }
 
@@ -138,8 +168,12 @@ class XattrManager {
 
     private static func isArchitectureCandidateFile(_ url: URL) -> Bool {
         var isDirectory: ObjCBool = false
-        guard FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory),
-              !isDirectory.boolValue
+        guard
+            FileManager.default.fileExists(
+                atPath: url.path,
+                isDirectory: &isDirectory
+            ),
+            !isDirectory.boolValue
         else {
             return false
         }
@@ -148,13 +182,17 @@ class XattrManager {
             return true
         }
 
-        return architectureLibraryExtensions.contains(url.pathExtension.lowercased())
+        return architectureLibraryExtensions.contains(
+            url.pathExtension.lowercased()
+        )
     }
 
     /// Removes the com.apple.quarantine extended attribute from a file
     /// - Parameter url: The URL of the file to process
     /// - Returns: The result of the removal operation
-    static func removeQuarantineAttribute(from url: URL) -> QuarantineRemovalResult {
+    static func removeQuarantineAttribute(from url: URL)
+        -> QuarantineRemovalResult
+    {
         let path = url.path
 
         // First verify the file exists
@@ -178,11 +216,15 @@ class XattrManager {
                 print("Quarantine attribute not found on: \(path)")
                 return .notFound
             } else if error == EPERM || error == EACCES {
-                print("Permission denied when removing quarantine attribute from \(path)")
+                print(
+                    "Permission denied when removing quarantine attribute from \(path)"
+                )
                 return .permissionDenied
             } else {
                 let errorMsg = String(cString: strerror(error))
-                print("Error removing quarantine attribute from \(path): \(errorMsg)")
+                print(
+                    "Error removing quarantine attribute from \(path): \(errorMsg)"
+                )
                 return .otherError(errorMsg)
             }
         }
@@ -198,32 +240,46 @@ class XattrManager {
         }
 
         let appPath = appURL.path
-        let sparkleFrameworkPath = appURL
+        let sparkleFrameworkPath =
+            appURL
             .appendingPathComponent("Contents/Frameworks/Sparkle.framework")
             .path
 
-        guard FileManager.default.fileExists(atPath: sparkleFrameworkPath) else {
-            print("Sparkle.framework not found at expected path: \(sparkleFrameworkPath)")
-            return .failure("Sparkle.framework was not found inside the app bundle.")
+        guard FileManager.default.fileExists(atPath: sparkleFrameworkPath)
+        else {
+            print(
+                "Sparkle.framework not found at expected path: \(sparkleFrameworkPath)"
+            )
+            return .failure(
+                "Sparkle.framework was not found inside the app bundle."
+            )
         }
 
         let sparkleResult = runCodeSign(for: sparkleFrameworkPath)
         guard sparkleResult.success else {
-            print("Failed to re-sign Sparkle.framework at \(sparkleFrameworkPath): \(sparkleResult.message)")
+            print(
+                "Failed to re-sign Sparkle.framework at \(sparkleFrameworkPath): \(sparkleResult.message)"
+            )
             return .failure(sparkleResult.message)
         }
 
         let appResult = runCodeSign(for: appPath)
         guard appResult.success else {
-            print("Failed to re-sign app bundle at \(appPath): \(appResult.message)")
+            print(
+                "Failed to re-sign app bundle at \(appPath): \(appResult.message)"
+            )
             return .failure(appResult.message)
         }
 
-        print("Successfully re-signed Sparkle.framework and app bundle at: \(appPath)")
+        print(
+            "Successfully re-signed Sparkle.framework and app bundle at: \(appPath)"
+        )
         return .success
     }
 
-    private static func runCodeSign(for targetPath: String) -> (success: Bool, message: String) {
+    private static func runCodeSign(for targetPath: String) -> (
+        success: Bool, message: String
+    ) {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/codesign")
         // Keep --deep to mirror the expected manual recovery command used by users for this app.
@@ -237,13 +293,19 @@ class XattrManager {
             try process.run()
             process.waitUntilExit()
             let data = outputPipe.fileHandleForReading.readDataToEndOfFile()
-            let output = String(data: data, encoding: .utf8)?
+            let output =
+                String(data: data, encoding: .utf8)?
                 .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
 
             if process.terminationStatus == 0 {
                 return (true, output)
             } else {
-                return (false, output.isEmpty ? "codesign failed with exit code \(process.terminationStatus)." : output)
+                return (
+                    false,
+                    output.isEmpty
+                        ? "codesign failed with exit code \(process.terminationStatus)."
+                        : output
+                )
             }
         } catch {
             return (false, error.localizedDescription)

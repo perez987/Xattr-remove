@@ -42,7 +42,8 @@ struct LanguageSelectorView: View {
 
     init() {
         // Load current language preference
-        let currentLang = UserDefaults.standard.stringArray(forKey: "AppleLanguages")?
+        let currentLang =
+            UserDefaults.standard.stringArray(forKey: "AppleLanguages")?
             .first?.components(separatedBy: "-").first
             ?? Locale.current.language.languageCode?.identifier
             ?? "en"
@@ -57,7 +58,8 @@ struct LanguageSelectorView: View {
                     Color(red: 0.60, green: 0.82, blue: 1.0).opacity(0.18),
                     Color(red: 0.75, green: 0.65, blue: 1.0).opacity(0.18),
                 ],
-                startPoint: .topLeading, endPoint: .bottomTrailing
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
             )
             .ignoresSafeArea()
 
@@ -68,22 +70,36 @@ struct LanguageSelectorView: View {
                     .font(.system(size: 26, weight: .medium))
                     .foregroundStyle(.blue)
 
-                Text(NSLocalizedString("language_selector_title", comment: "Language selector title"))
-                    .font(.title3.weight(.semibold))
-                    .foregroundColor(.primary.opacity(0.85))
-                    .padding(.top, 10)
-                    .padding(.bottom, 14)
+                Text(
+                    NSLocalizedString(
+                        "language_selector_title",
+                        comment: "Language selector title"
+                    )
+                )
+                .font(.title3.weight(.semibold))
+                .foregroundColor(.primary.opacity(0.85))
+                .padding(.top, 10)
+                .padding(.bottom, 14)
 
                 // Language list inside a glass card
                 RoundedRectangle(cornerRadius: 14)
                     .fill(.ultraThinMaterial)
                     .overlay(
                         RoundedRectangle(cornerRadius: 14)
-                            .strokeBorder(Color.green.opacity(0.35), lineWidth: 1)
-                            .shadow(color: .black.opacity(0.12), radius: 16, x: 0, y: 4)
+                            .strokeBorder(
+                                Color.green.opacity(0.35),
+                                lineWidth: 1
+                            )
+                            .shadow(
+                                color: .black.opacity(0.12),
+                                radius: 16,
+                                x: 0,
+                                y: 4
+                            )
                     )
                     .overlay(
-                        List(languages, selection: $selectedLanguage) { language in
+                        List(languages, selection: $selectedLanguage) {
+                            language in
                             HStack(spacing: 10) {
                                 Text(language.flag)
                                     .font(.title2)
@@ -107,12 +123,16 @@ struct LanguageSelectorView: View {
 
                 // Buttons
                 HStack(spacing: 12) {
-                    Button(NSLocalizedString("cancel", comment: "Cancel button")) {
+                    Button(
+                        NSLocalizedString("cancel", comment: "Cancel button")
+                    ) {
                         dismiss()
                     }
                     .keyboardShortcut(.cancelAction)
 
-                    Button(NSLocalizedString("accept", comment: "Accept button")) {
+                    Button(
+                        NSLocalizedString("accept", comment: "Accept button")
+                    ) {
                         if hasLanguageChanged {
                             saveLanguagePreference()
                             showRestartAlert = true
@@ -129,14 +149,22 @@ struct LanguageSelectorView: View {
         }
         .frame(width: 280)
         .alert(
-            NSLocalizedString("language_changed_title", comment: "Language changed alert title"),
+            NSLocalizedString(
+                "language_changed_title",
+                comment: "Language changed alert title"
+            ),
             isPresented: $showRestartAlert
         ) {
             Button(NSLocalizedString("ok", comment: "OK button")) {
                 dismiss()
             }
         } message: {
-            Text(NSLocalizedString("language_changed_message", comment: "Language changed message"))
+            Text(
+                NSLocalizedString(
+                    "language_changed_message",
+                    comment: "Language changed message"
+                )
+            )
         }
     }
 
