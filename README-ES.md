@@ -1,8 +1,9 @@
 # Xattr-remove: eliminar `com.apple.quarantine`
 
 ![Platform](https://img.shields.io/badge/macOS-13.5+-orange.svg)
-![Swift](https://img.shields.io/badge/Swift-5+-green.svg)
+![Swift](https://img.shields.io/badge/Swift-5+-lavender.svg)
 ![Xcode](https://img.shields.io/badge/Xcode-15-blue.svg)
+![Downloads](https://img.shields.io/github/downloads/perez987/Xattr-remove/total?style=flat&label=Downloads&labelColor=Downloads)
 
 Aplicación SwiftUI para macOS que elimina el atributo extendido `com.apple.quarantine` de los archivos descargados de Internet. Funciona aceptando archivos mediante arrastrar y soltar sobre la ventana de la aplicación.
 
