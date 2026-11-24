@@ -1,0 +1,7 @@
+/*
+  ServicesMenu.strings
+  Xattr-remove
+  French localization of the Finder service menu item (NSServices in Info.plist)
+*/
+
+"Remove quarantine (Xattr-remove)" = "Supprimer la quarantaine (Xattr-remove)";
