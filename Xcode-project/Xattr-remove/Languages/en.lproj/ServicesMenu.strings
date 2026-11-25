@@ -4,4 +4,4 @@
   English localization of the Finder service menu item (NSServices in Info.plist)
 */
 
-"Remove quarantine (Xattr-remove)" = "Remove quarantine (Xattr-remove)";
+"Remove quarantine (Xattr-remove)" = "Remove quarantine attribute";
