@@ -1,6 +1,6 @@
 # Acción rápida del Finder: Eliminar atributo de cuarentena
 
-Acción rápida de Automator, independiente de la app Xattr-remove. Añade al menú contextual del Finder la opción **Acciones rápidas → Eliminar cuarentena** (o **Servicios → …**).
+Acción rápida de Automator, que añade al menú contextual del Finder la opción **Acciones rápidas → Eliminar cuarentena**.
 
 Para cada archivo, carpeta, app, `.dmg` o `.pkg` seleccionado ejecuta:
 
@@ -20,9 +20,18 @@ cd Finder-QuickAction
 
 **Opción B, a mano:** haz doble clic en `Eliminar cuarentena.workflow` y acepta **Instalar**. También puedes copiarlo a `~/Library/Services/`.
 
-Si no aparece en el menú, actívalo en **Ajustes del Sistema → Teclado → Funciones rápidas de teclado → Servicios** (sección *Archivos y carpetas*) o ejecuta `killall Finder`.
+Si no aparece en el menú:
+
+- Actívalo en **Ajustes del Sistema → Teclado → Funciones rápidas de teclado → Servicios** (sección *Archivos y carpetas*)
+- Limpia la caché con:
+
+```bash
+/System/Library/CoreServices/pbs -flush; /System/Library/CoreServices/pbs -update
+killall Finder
+```
 
 ## Desinstalación
+
 ```bash
 ./uninstall.sh
 ```

@@ -8,14 +8,12 @@ El servicio "Remove quarantine (Xattr-remove)" no es un archivo aparte: está de
 - **Eliminarlo del todo:** tienes que dar de baja todas las copias registradas.
 
 ```bash
-LSREG=/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister
-
 # Ver qué copias de la app tiene registradas el sistema
-$LSREG -dump | grep -i "path:.*Xattr-remove.app" | sort -u
+$/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -dump | grep -i "path:.*Xattr-remove.app" | sort -u
 
 # Dar de baja cada ruta que aparezca (ejemplo)
-$LSREG -u "/Applications/Xattr-remove.app"
-$LSREG -u ~/Library/Developer/Xcode/DerivedData/Xattr-remove-*/Build/Products/*/Xattr-remove.app
+$/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -u "/Applications/Xattr-remove.app"
+$/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -u ~/Library/Developer/Xcode/DerivedData/Xattr-remove-*/Build/Products/*/Xattr-remove.app
 
 # Opcional: borrar los builds de Xcode para que no se vuelva a registrar
 rm -rf ~/Library/Developer/Xcode/DerivedData/Xattr-remove-*
@@ -24,7 +22,7 @@ rm -rf ~/Library/Developer/Xcode/DerivedData/Xattr-remove-*
 killall Finder
 ```
 
-Si quieres seguir usando la app pero sin el servicio, tendrías que quitar el bloque `NSServices` del `Info.plist` y recompilarla. Si no, en cuanto se vuelva a abrir, macOS lo registra otra vez.
+Si quieres seguir usando la app pero sin el servicio, hay que quitar el bloque `NSServices` del archivo `Info.plist` y recompilarla. Si no, en cuanto se vuelva a abrir, macOS lo registra otra vez.
 
 ## 2. La nueva Acción rápida no aparece
 
@@ -38,8 +36,11 @@ Compruébalo en este orden:
 
    ```bash
    touch /tmp/t.txt && xattr -w com.apple.quarantine "0000;00000000;Safari;" /tmp/t.txt
-   automator -i /tmp/t.txt ~/Library/Services/"Eliminar cuarentena.workflow"
-   xattr -l /tmp/t.txt   # no debería mostrar nada
+   xattr -l /tmp/t.txt
+   # com.apple.quarantine: 0000;00000000;Safari;
+   automator -i /tmp/t.txt ~/Library/Services/"Remove-quarantine.workflow"
+   xattr -l /tmp/t.txt
+   # 
    ```
 
 ### Crear la Acción rápida desde Automator (lo más fiable)

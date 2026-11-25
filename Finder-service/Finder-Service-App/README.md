@@ -2,7 +2,7 @@
 
 *[Versión en español](README-ES.md)*
 
-A minimal macOS app with no window and no Dock icon, independent of Xattr-remove. Its only purpose is to provide the **Remove quarantine** service in the Finder context menu. Because the service is declared by an application (like Terminal's "New Terminal at Folder"), it appears at the **top level** of the context menu, not inside *Quick Actions*.
+A minimal macOS app with no window and no Dock icon. Its only purpose is to provide the **Remove quarantine** service in the Finder context menu. Because the service is declared by an application (like Terminal's "New Terminal at Folder"), it appears at the **top level** of the context menu, not inside *Quick Actions*.
 
 ## What it does
 
@@ -36,19 +36,28 @@ Then make sure **Remove quarantine** is enabled in *System Settings → Keyboard
 
 ## Signing and notarization for other users
 
-With an ad hoc signature the app works on your own Mac. On another Mac, Gatekeeper blocks it the first time and the user has to allow it in *System Settings → Privacy & Security*. To avoid that, sign the app with a **Developer ID Application** certificate and notarize it with Apple. An *Apple Development* certificate is for development only, not for distribution.
+With an ad hoc signature the app works on your own Mac. On another Mac, Gatekeeper blocks it the first time and the user has to allow it in *System Settings → Privacy & Security*. To avoid that, the app is signed with a **Developer ID Application** certificate and notarized it with Apple.
 
-**1. Notarization credentials (once).** You need an app-specific password, created at appleid.apple.com, and your Team ID:
+**1. Notarization credentials (once).** You need an app-specific password, created at appleid.apple.com, and your Team ID.
+
+Run (you only need to do it once):
 
 ```bash
 xcrun notarytool store-credentials "notary-profile" --apple-id "you@example.com" --team-id "TEAMID"
 ```
+It asks for the app-specific password.
 
-**2. Build and sign.** `build.sh` looks for the first *Developer ID Application* identity in the keychain and signs with the hardened runtime and a secure timestamp. If it finds none, it signs ad hoc. To choose the identity yourself:
+**2. Build and sign.** `build.sh` looks for the first *Developer ID Application* identity in the keychain and signs with the hardened runtime and a secure timestamp. If it finds none, it signs ad hoc:
 
 ```bash
 ./build.sh
 # or
+sh build.sh
+```
+
+To choose the identity yourself:
+
+```bash
 SIGN_IDENTITY="Developer ID Application: Name (TEAMID)" ./build.sh
 ```
 
@@ -56,6 +65,8 @@ SIGN_IDENTITY="Developer ID Application: Name (TEAMID)" ./build.sh
 
 ```bash
 ./notarize.sh
+# or
+sh notarize.sh
 ```
 
 The result is `build/Remove-quarantine.zip`, ready to distribute.
