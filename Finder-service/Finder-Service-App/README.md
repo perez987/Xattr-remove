@@ -36,7 +36,13 @@ Then make sure **Remove quarantine** is enabled in *System Settings → Keyboard
 
 ## Signing and notarization for other users
 
-With an ad hoc signature the app works on your own Mac. On another Mac, Gatekeeper blocks it the first time and the user has to allow it in *System Settings → Privacy & Security*. To avoid that, the app is signed with a **Developer ID Application** certificate and notarized it with Apple.
+With an ad hoc signature the app works on your own Mac. On another Mac, Gatekeeper blocks it the first time and the user has to allow it in *System Settings → Privacy & Security*.
+
+To avoid that, the app is already signed with a **Developer ID Application** certificate and notarized with Apple, so there shouldn't be any issues with Gatekeeper.
+
+### Sign with your own certificate
+
+If you want to generate the signed app using your own Apple Developer ID, here are the instructions:
 
 **1. Notarization credentials (once).** You need an app-specific password, created at appleid.apple.com, and your Team ID.
 
@@ -45,6 +51,7 @@ Run (you only need to do it once):
 ```bash
 xcrun notarytool store-credentials "notary-profile" --apple-id "you@example.com" --team-id "TEAMID"
 ```
+
 It asks for the app-specific password.
 
 **2. Build and sign.** `build.sh` looks for the first *Developer ID Application* identity in the keychain and signs with the hardened runtime and a secure timestamp. If it finds none, it signs ad hoc:
